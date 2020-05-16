@@ -9,7 +9,7 @@ import java.util.List;
 public class LoginCommand implements Command {
 
     @Override
-    public void operation(OutputStream outputStream, String[] tokens, String login, Server server) throws IOException {
+    public void execute(OutputStream outputStream, String[] tokens, String login, Server server) throws IOException {
         if(tokens.length == 2) {
             login = tokens[1];
             String msg = "online\n";
@@ -30,7 +30,7 @@ public class LoginCommand implements Command {
     }
 
     @Override
-    public void operation() {
+    public void execute() {
 
     }
 }

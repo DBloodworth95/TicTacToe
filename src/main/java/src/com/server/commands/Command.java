@@ -6,6 +6,6 @@ import java.io.OutputStream;
 
 
 public interface Command {
-    public void operation(OutputStream outputStream, String[] tokens, String login, Server server) throws IOException;
-    public void operation();
+    public void execute(OutputStream outputStream, String[] tokens, String login, Server server) throws IOException;
+    public void execute();
 }

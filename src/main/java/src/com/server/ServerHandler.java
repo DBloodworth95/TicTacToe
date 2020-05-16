@@ -1,9 +1,7 @@
 package src.com.server;
 
 import src.com.server.commands.Command;
-import src.com.server.commands.CommandExecuter;
 import src.com.server.commands.LoginCommand;
-
 import java.io.*;
 import java.net.Socket;
 import java.util.HashMap;
@@ -15,6 +13,7 @@ public class ServerHandler extends Thread {
     private String login = null;
     private OutputStream sendStream;
     Map<String, Command> serverCommands = new HashMap<>();
+
     public ServerHandler(Server server, Socket clientSocket) {
         this.server = server;
         this.clientSocket = clientSocket;
@@ -39,12 +38,8 @@ public class ServerHandler extends Thread {
            String[] tokens = line.split(" ");
            if(tokens.length > 0) {
                String cmd = tokens[0];
-               for(Map.Entry<String, Command> command : serverCommands.entrySet()) {
-                   if(cmd.equalsIgnoreCase(command.getKey())) {
-                       CommandExecuter commandExecuter = new CommandExecuter(command.getValue());
-                       commandExecuter.executeCommand(sendStream, tokens, this.login, server);
-                   }
-               }
+               Command c = serverCommands.get(cmd);
+               c.execute(sendStream, tokens, this.login, server);
            }
        }
     }
