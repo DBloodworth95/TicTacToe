@@ -6,11 +6,13 @@ import java.io.*;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ServerHandler extends Thread {
     private final Socket clientSocket;
     private final Server server;
-    private String login = null;
+    //public String login = null;
+    public AtomicReference<String> login = new AtomicReference<>();
     private OutputStream sendStream;
     Map<String, Command> serverCommands = new HashMap<>();
 
@@ -39,13 +41,13 @@ public class ServerHandler extends Thread {
            if(tokens.length > 0) {
                String cmd = tokens[0];
                Command c = serverCommands.get(cmd);
-               c.execute(sendStream, tokens, this.login, server);
+               c.execute(sendStream, tokens, login, server);
            }
        }
     }
 
     public String getLogin() {
-        return login;
+        return login.toString();
     }
 
     public void send(String msg) throws IOException {
