@@ -11,7 +11,6 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ServerHandler extends Thread {
     private final Socket clientSocket;
     private final Server server;
-    //public String login = null;
     public AtomicReference<String> login = new AtomicReference<>();
     private OutputStream sendStream;
     Map<String, Command> serverCommands = new HashMap<>();
