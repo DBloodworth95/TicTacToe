@@ -48,6 +48,31 @@ public class Client {
 
     }
 
+    public boolean login(String login) throws IOException {
+        String cmd = "login " + login + " " + "\n";
+        outputStream.write(cmd.getBytes());
+        String response = bufferedReader.readLine();
+        if("online".equalsIgnoreCase(response)) {
+            startMessageReader();
+            return true;
+        } else
+            return false;
+    }
+
+    public void startMessageReader() {
+        Thread t = new Thread() {
+            @Override
+            public void run() {
+                readMessageLoop();
+            }
+        };
+        t.start();
+    }
+
+    public void readMessageLoop() {
+
+    }
+
     public boolean connect() {
         try {
             this.socket = new Socket(serverName, port);
