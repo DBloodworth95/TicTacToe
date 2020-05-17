@@ -1,5 +1,6 @@
 package src.com.server;
 
+import src.com.server.commands.AddCrossCommand;
 import src.com.server.commands.AddNaughtCommand;
 import src.com.server.commands.Command;
 import src.com.server.commands.LoginCommand;
@@ -21,6 +22,7 @@ public class ServerHandler extends Thread {
         this.clientSocket = clientSocket;
         serverCommands.put("login", new LoginCommand());
         serverCommands.put("naught", new AddNaughtCommand());
+        serverCommands.put("cross", new AddCrossCommand());
     }
 
     @Override
