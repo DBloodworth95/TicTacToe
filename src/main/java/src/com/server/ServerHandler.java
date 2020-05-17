@@ -1,9 +1,7 @@
 package src.com.server;
 
-import src.com.server.commands.AddCrossCommand;
-import src.com.server.commands.AddNaughtCommand;
-import src.com.server.commands.Command;
-import src.com.server.commands.LoginCommand;
+import src.com.server.commands.*;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.HashMap;
