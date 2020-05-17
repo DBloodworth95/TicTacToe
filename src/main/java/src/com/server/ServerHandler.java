@@ -1,5 +1,6 @@
 package src.com.server;
 
+import src.com.server.commands.AddNaughtCommand;
 import src.com.server.commands.Command;
 import src.com.server.commands.LoginCommand;
 import java.io.*;
@@ -19,6 +20,7 @@ public class ServerHandler extends Thread {
         this.server = server;
         this.clientSocket = clientSocket;
         serverCommands.put("login", new LoginCommand());
+        serverCommands.put("naught", new AddNaughtCommand());
     }
 
     @Override
@@ -39,8 +41,13 @@ public class ServerHandler extends Thread {
            String[] tokens = line.split(" ");
            if(tokens.length > 0) {
                String cmd = tokens[0];
-               Command c = serverCommands.get(cmd);
-               c.execute(sendStream, tokens, login, server);
+               if(serverCommands.containsKey(cmd)) {
+                   Command c = serverCommands.get(cmd);
+                   c.execute(sendStream, tokens, login, server);
+               } else {
+                   String invCmd = "Invalid command: " + tokens[0] + "\n";
+                   sendStream.write(invCmd.getBytes());
+               }
            }
        }
     }
