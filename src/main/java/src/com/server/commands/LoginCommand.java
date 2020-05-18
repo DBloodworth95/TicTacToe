@@ -25,6 +25,16 @@ public class LoginCommand implements Command {
                     handler.send(onlineMsg);
                 }
             }
+            String naughtMsg = "naught" + "\n";
+            String crossMsg = "cross" + "\n";
+            if(server.getHandlers().size() == 1) {
+                outputStream.write(naughtMsg.getBytes());
+                System.out.println("naught sent");
+            }
+            else {
+                outputStream.write(crossMsg.getBytes());
+                System.out.println("cross sent");
+            }
         }
     }
 

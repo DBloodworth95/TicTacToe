@@ -14,7 +14,8 @@ public class Client {
     private InputStream inputStream;
     private BufferedReader bufferedReader;
     private final String username;
-    private final Symbol symbol;
+    private Symbol symbol;
+    private SymbolAssigner symbolAssigner = new SymbolAssigner();
     private ArrayList<LobbyStatusListener> lobbyStatusListeners = new ArrayList<>();
     private ArrayList<MessageListener> messageListeners = new ArrayList<>();
 
@@ -25,7 +26,7 @@ public class Client {
         this.symbol = symbol;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         Client client = new Client("localhost", 8818, "test", null);
         client.addLobbyStatusListener(new LobbyStatusListener() {
             @Override
@@ -44,8 +45,14 @@ public class Client {
 
             }
         });
-
-
+        if(!client.connect()) {
+            System.err.println("Connection failed!");
+        } else {
+            System.out.println("Connection made!");
+            if(client.login("guest")) {
+                System.out.println("Login successful!");
+            }
+        }
     }
 
     public boolean login(String login) throws IOException {
@@ -70,7 +77,19 @@ public class Client {
     }
 
     public void readMessageLoop() {
-
+        try {
+            String line;
+            while((line = bufferedReader.readLine()) != null) {
+                String[] tokens = line.split(" ");
+                    String cmd = tokens[0];
+                    if("cross".equalsIgnoreCase(cmd) || "naught".equalsIgnoreCase(cmd)) {
+                        this.symbol = symbolAssigner.assign(cmd);
+                        System.out.println(this.symbol.toString());
+;                    }
+                }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean connect() {

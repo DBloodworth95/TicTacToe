@@ -19,8 +19,8 @@ public class ServerHandler extends Thread {
         this.server = server;
         this.clientSocket = clientSocket;
         serverCommands.put("login", new LoginCommand());
-        serverCommands.put("naught", new AddNaughtCommand());
-        serverCommands.put("cross", new AddCrossCommand());
+        serverCommands.put("addnaught", new AddNaughtCommand());
+        serverCommands.put("addcross", new AddCrossCommand());
     }
 
     @Override
