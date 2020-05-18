@@ -9,11 +9,15 @@ public class Board {
         tiles = new Symbol[3][3];
     }
 
-    public void addSymbol(Symbol symbol, int x, int y) {
-        tiles[x][y] = symbol;
+    public boolean addSymbol(Symbol symbol, int x, int y) {
+        if(isValidTile(x, y)) {
+            tiles[x][y] = symbol;
+            return true;
+        }
+        return false;
     }
 
-    public boolean isValid(int x, int y) {
+    public boolean isValidTile(int x, int y) {
         return tiles[x][y] == null;
     }
 
