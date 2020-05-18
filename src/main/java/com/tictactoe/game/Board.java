@@ -1,6 +1,6 @@
-package src.com.game;
+package com.tictactoe.game;
 
-import src.com.client.Symbol;
+import com.tictactoe.client.Symbol;
 
 public class Board {
     private Symbol[][] tiles;

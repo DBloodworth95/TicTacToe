@@ -1,9 +1,7 @@
-package src.com.client;
+package com.tictactoe.client;
 
 import java.io.*;
-import java.lang.reflect.Array;
 import java.net.Socket;
-import java.nio.Buffer;
 import java.util.ArrayList;
 
 public class Client {

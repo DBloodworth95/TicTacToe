@@ -1,4 +1,4 @@
-package src.com.server;
+package com.tictactoe.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;

@@ -1,4 +1,4 @@
-package src.com.client;
+package com.tictactoe.client;
 
 public class SymbolAssigner {
 

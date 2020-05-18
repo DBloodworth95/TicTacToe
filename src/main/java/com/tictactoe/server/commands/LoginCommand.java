@@ -1,7 +1,7 @@
-package src.com.server.commands;
+package com.tictactoe.server.commands;
 
-import src.com.server.Server;
-import src.com.server.ServerHandler;
+import com.tictactoe.server.Server;
+import com.tictactoe.server.ServerHandler;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;

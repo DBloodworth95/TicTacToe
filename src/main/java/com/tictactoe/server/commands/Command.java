@@ -1,6 +1,6 @@
-package src.com.server.commands;
+package com.tictactoe.server.commands;
 
-import src.com.server.Server;
+import com.tictactoe.server.Server;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.concurrent.atomic.AtomicReference;

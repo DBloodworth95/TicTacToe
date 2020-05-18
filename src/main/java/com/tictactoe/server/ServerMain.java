@@ -1,4 +1,4 @@
-package src.com.server;
+package com.tictactoe.server;
 
 public class ServerMain {
     public static void main(String[] args) {
