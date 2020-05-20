@@ -103,6 +103,17 @@ public class Client {
         return false;
     }
 
+    public void requestSymbol(int x, int y) throws IOException {
+        String symbolCmd;
+        if (symbol.toString().equalsIgnoreCase("x"))
+            symbolCmd = "addcross";
+        else
+            symbolCmd = "addnaught";
+        String cmd = symbolCmd + " " + x + " " + y + "\n";
+        System.out.println(cmd);
+        outputStream.write(cmd.getBytes());
+    }
+
     public void addLobbyStatusListener(LobbyStatusListener listener) {
         lobbyStatusListeners.add(listener);
     }
