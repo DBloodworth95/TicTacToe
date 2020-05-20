@@ -1,5 +1,6 @@
 package com.tictactoe.server.commands;
 
+import com.tictactoe.game.Board;
 import com.tictactoe.server.Server;
 import com.tictactoe.server.ServerHandler;
 import java.io.IOException;
@@ -10,7 +11,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class LoginCommand implements Command {
 
     @Override
-    public void execute(OutputStream outputStream, String[] tokens, AtomicReference<String> login, Server server) throws IOException {
+    public void execute(OutputStream outputStream, String[] tokens, AtomicReference<String> login, Server server, Board board) throws IOException {
         if(tokens.length == 2) {
             String loggedIn = tokens[1];
             System.out.println(loggedIn);

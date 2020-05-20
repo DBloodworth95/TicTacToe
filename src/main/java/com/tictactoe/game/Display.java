@@ -1,6 +1,9 @@
 package com.tictactoe.game;
 
 import com.tictactoe.client.Client;
+import com.tictactoe.client.MessageListener;
+import com.tictactoe.client.Symbol;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -11,6 +14,26 @@ public class Display extends JFrame implements ActionListener {
     Client client = new Client("localhost", 8818, "guest", null);
     JButton[][] tiles = new JButton[3][3];
     JPanel gamePanel = new JPanel();
+
+    public Display() {
+        client.addMessageListener(new MessageListener() {
+            @Override
+            public void onMessage(String login, String[] msg) {
+                System.out.println("message");
+                Symbol symbol;
+                if(msg.length == 3) {
+                    if(msg[0].equalsIgnoreCase("addnaught"))
+                        symbol = Symbol.O;
+                    else
+                        symbol = Symbol.X;
+                    String x = msg[1];
+                    String y = msg[2];
+                    tiles[Integer.parseInt(x)][Integer.parseInt(y)].setText(String.valueOf(symbol));
+                    tiles[Integer.parseInt(x)][Integer.parseInt(y)].setEnabled(false);
+                }
+            }
+        });
+    }
 
     public void initialize() throws IOException {
         client.connect();

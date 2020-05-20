@@ -24,35 +24,6 @@ public class Client {
         this.symbol = symbol;
     }
 
-    public static void main(String[] args) throws IOException {
-        Client client = new Client("localhost", 8818, "test", null);
-        client.addLobbyStatusListener(new LobbyStatusListener() {
-            @Override
-            public void online(String login) {
-
-            }
-
-            @Override
-            public void offline(String login) {
-
-            }
-        });
-        client.addMessageListener(new MessageListener() {
-            @Override
-            public void onMessage(String login, String msg) {
-
-            }
-        });
-        if(!client.connect()) {
-            System.err.println("Connection failed!");
-        } else {
-            System.out.println("Connection made!");
-            if(client.login("guest")) {
-                System.out.println("Login successful!");
-            }
-        }
-    }
-
     public boolean login(String login) throws IOException {
         String cmd = "login " + login + " " + "\n";
         outputStream.write(cmd.getBytes());
@@ -83,10 +54,19 @@ public class Client {
                     if("cross".equalsIgnoreCase(cmd) || "naught".equalsIgnoreCase(cmd)) {
                         this.symbol = symbolAssigner.assign(cmd);
                         System.out.println(this.symbol.toString());
-;                    }
+;                    } else if("addcross".equalsIgnoreCase(cmd) || "addnaught".equalsIgnoreCase(cmd)) {
+                        String[] tokenUpdate = line.split(" ", 3);
+                        handleUpdate(tokenUpdate);
+                    }
                 }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void handleUpdate(String[] tokenUpdate) {
+        for(MessageListener listener : messageListeners) {
+            listener.onMessage(null, tokenUpdate);
         }
     }
 

@@ -1,5 +1,7 @@
 package com.tictactoe.server.commands;
 
+import com.tictactoe.client.Symbol;
+import com.tictactoe.game.Board;
 import com.tictactoe.server.Server;
 import com.tictactoe.server.ServerHandler;
 import java.io.IOException;
@@ -9,17 +11,23 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class AddCrossCommand implements Command {
     @Override
-    public void execute(OutputStream outputStream, String[] tokens, AtomicReference<String> login, Server server) throws IOException {
+    public void execute(OutputStream outputStream, String[] tokens, AtomicReference<String> login, Server server, Board board) throws IOException {
+        List<ServerHandler> handlerList = server.getHandlers();
         if(tokens.length == 3) {
             String tileX = tokens[1];
             String tileY = tokens[2];
-            String msg = "cross" + " " + tileX + " " + tileY + "\n";
-            outputStream.write(msg.getBytes());
-            System.out.println("cross" + " " + tileX + " " + tileY);
-            List<ServerHandler> handlerList = server.getHandlers();
-            for(ServerHandler handler : handlerList) {
-                if(!login.toString().equalsIgnoreCase(handler.getLogin()))
+            String msg = "addcross" + " " + tileX + " " + tileY + "\n";
+            String invalidTileMsg = "Invalid tile" + "\n";
+            if(board.isValidTile(Integer.parseInt(tileX), Integer.parseInt(tileY))) {
+                board.addSymbol(Symbol.X, Integer.parseInt(tileX), Integer.parseInt(tileY));
+                System.out.println("cross" + " " + tileX + " " + tileY);
+                for(ServerHandler handler : handlerList) {
                     handler.send(msg);
+                }
+            } else {
+                for(ServerHandler handler : handlerList) {
+                    handler.send(invalidTileMsg);
+                }
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.tictactoe.server;
 
+import com.tictactoe.game.Board;
 import com.tictactoe.server.commands.AddCrossCommand;
 import com.tictactoe.server.commands.AddNaughtCommand;
 import com.tictactoe.server.commands.Command;
@@ -15,13 +16,16 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ServerHandler extends Thread {
     private final Socket clientSocket;
     private final Server server;
+    private Board board;
     public AtomicReference<String> login = new AtomicReference<>();
     private OutputStream sendStream;
     Map<String, Command> serverCommands = new HashMap<>();
 
-    public ServerHandler(Server server, Socket clientSocket) {
+
+    public ServerHandler(Server server, Socket clientSocket, Board board) {
         this.server = server;
         this.clientSocket = clientSocket;
+        this.board = board;
         serverCommands.put("login", new LoginCommand());
         serverCommands.put("addnaught", new AddNaughtCommand());
         serverCommands.put("addcross", new AddCrossCommand());
@@ -47,7 +51,7 @@ public class ServerHandler extends Thread {
                String cmd = tokens[0];
                if(serverCommands.containsKey(cmd)) {
                    Command c = serverCommands.get(cmd);
-                   c.execute(sendStream, tokens, login, server);
+                   c.execute(sendStream, tokens, login, server, board);
                } else {
                    String invCmd = "Invalid command: " + tokens[0] + "\n";
                    sendStream.write(invCmd.getBytes());
