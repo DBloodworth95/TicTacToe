@@ -11,9 +11,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class AddNaughtCommand implements Command {
     @Override
-    public void execute(OutputStream outputStream, String[] tokens, AtomicReference<String> login, Server server, Board board, AtomicReference<Integer> isTurn) throws IOException {
+    public void execute(OutputStream outputStream, String[] tokens, AtomicReference<String> login, Server server, Board board) throws IOException {
         List<ServerHandler> handlerList = server.getHandlers();
-        if(tokens.length == 3 && Integer.parseInt(isTurn.toString()) == 1) {
+        if(tokens.length == 3 && board.getIsTurn() % 2 != 0) {
             String tileX = tokens[1];
             String tileY = tokens[2];
             String msg = "addnaught" + " " + tileX + " " + tileY + "\n";
@@ -24,7 +24,6 @@ public class AddNaughtCommand implements Command {
                 System.out.println("naught" + " " + tileX + " " + tileY);
                 for(ServerHandler handler : handlerList) {
                     handler.send(msg);
-                    handler.getIsTurn().set(2);
                     if(board.isWin()) {
                         System.out.println("Win");
                         handler.send(winMsg);

@@ -19,7 +19,6 @@ public class ServerHandler extends Thread {
     private Board board;
     public AtomicReference<String> login = new AtomicReference<>();
     private OutputStream sendStream;
-    public AtomicReference<Integer> isTurn = new AtomicReference<>(1);
     Map<String, Command> serverCommands = new HashMap<>();
 
 
@@ -36,29 +35,29 @@ public class ServerHandler extends Thread {
     public void run() {
         try {
             handleClientSocket();
-        } catch(IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     private void handleClientSocket() throws IOException {
-       InputStream inputStream = clientSocket.getInputStream();
-       this.sendStream = clientSocket.getOutputStream();
-       BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-       String line;
-       while((line = reader.readLine()) != null) {
-           String[] tokens = line.split(" ");
-           if(tokens.length > 0) {
-               String cmd = tokens[0];
-               if(serverCommands.containsKey(cmd)) {
-                   Command c = serverCommands.get(cmd);
-                   c.execute(sendStream, tokens, login, server, board, this.isTurn);
-               } else {
-                   String invCmd = "Invalid command: " + tokens[0] + "\n";
-                   sendStream.write(invCmd.getBytes());
-               }
-           }
-       }
+        InputStream inputStream = clientSocket.getInputStream();
+        this.sendStream = clientSocket.getOutputStream();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            String[] tokens = line.split(" ");
+            if (tokens.length > 0) {
+                String cmd = tokens[0];
+                if (serverCommands.containsKey(cmd)) {
+                    Command c = serverCommands.get(cmd);
+                    c.execute(sendStream, tokens, login, server, board);
+                } else {
+                    String invCmd = "Invalid command: " + tokens[0] + "\n";
+                    sendStream.write(invCmd.getBytes());
+                }
+            }
+        }
     }
 
     public String getLogin() {
@@ -66,11 +65,7 @@ public class ServerHandler extends Thread {
     }
 
     public void send(String msg) throws IOException {
-        if(login != null)
+        if (login != null)
             sendStream.write(msg.getBytes());
-    }
-
-    public AtomicReference<Integer> getIsTurn() {
-        return isTurn;
     }
 }

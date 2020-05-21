@@ -4,13 +4,16 @@ import com.tictactoe.client.Symbol;
 
 public class Board {
     private Symbol[][] tiles;
+    private int isTurn;
 
     public Board() {
         tiles = new Symbol[3][3];
+        this.isTurn = 1;
     }
 
     public boolean addSymbol(Symbol symbol, int x, int y) {
         if(isValidTile(x, y)) {
+            isTurn++;
             tiles[x][y] = symbol;
             return true;
         }
@@ -54,5 +57,9 @@ public class Board {
 
     public Symbol[][] getTiles() {
         return tiles;
+    }
+
+    public int getIsTurn() {
+        return isTurn;
     }
 }

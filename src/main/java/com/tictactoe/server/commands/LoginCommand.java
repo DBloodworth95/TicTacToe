@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class LoginCommand implements Command {
 
     @Override
-    public void execute(OutputStream outputStream, String[] tokens, AtomicReference<String> login, Server server, Board board, AtomicReference<Integer> isTurn) throws IOException {
+    public void execute(OutputStream outputStream, String[] tokens, AtomicReference<String> login, Server server, Board board) throws IOException {
         if(tokens.length == 2) {
             String loggedIn = tokens[1];
             System.out.println(loggedIn);
