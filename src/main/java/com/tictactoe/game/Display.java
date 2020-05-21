@@ -33,11 +33,13 @@ public class Display extends JFrame implements ActionListener {
                 symbol = Symbol.O;
                 tiles[Integer.parseInt(x)][Integer.parseInt(y)].setForeground(Color.GREEN);
                 tiles[Integer.parseInt(x)][Integer.parseInt(y)].setText(String.valueOf(symbol));
+                statusLabel.setText("Current turn: Cross");
             }
             else if(msg[0].equalsIgnoreCase("addcross")) {
                 symbol = Symbol.X;
                 tiles[Integer.parseInt(x)][Integer.parseInt(y)].setForeground(Color.RED);
                 tiles[Integer.parseInt(x)][Integer.parseInt(y)].setText(String.valueOf(symbol));
+                statusLabel.setText("Current turn: Naught");
             }
             else if(msg[0].equalsIgnoreCase("win")) {
                 String winner = msg[1];
