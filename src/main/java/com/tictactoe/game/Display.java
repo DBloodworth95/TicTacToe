@@ -16,6 +16,8 @@ public class Display extends JFrame implements ActionListener {
     JPanel statusPanel = new JPanel();
     JPanel gamePanel = new JPanel();
     JLabel statusLabel = new JLabel("Current turn: ");
+    final JOptionPane finalStatePane = new JOptionPane(" ");
+    final JDialog finalDialogue = finalStatePane.createDialog((JFrame)null, " ");
 
     public Display() {
         client.addMessageListener(new MessageListener() {
@@ -42,9 +44,13 @@ public class Display extends JFrame implements ActionListener {
                 else if(msg[0].equalsIgnoreCase("win")) {
                     String winner = msg[1];
                     if(client.getSymbol().toString().equalsIgnoreCase(winner)) {
-                        JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "You win!");
+                        finalDialogue.setTitle("You win!");
+                        finalDialogue.setLocationRelativeTo(getRootPane());
+                        finalDialogue.setVisible(true);
                     } else {
-                        JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "You lose!");
+                        finalDialogue.setTitle("You lose!");
+                        finalDialogue.setLocationRelativeTo(getRootPane());
+                        finalDialogue.setVisible(true);
                     }
                 }
             }
