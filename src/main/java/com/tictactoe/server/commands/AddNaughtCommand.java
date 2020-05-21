@@ -18,13 +18,16 @@ public class AddNaughtCommand implements Command {
             String tileY = tokens[2];
             String msg = "addnaught" + " " + tileX + " " + tileY + "\n";
             String invalidTileMsg = "Invalid tile" + "\n";
+            String winMsg = "win" + " " + Symbol.O.toString() + "\n";
             if(board.isValidTile(Integer.parseInt(tileX), Integer.parseInt(tileY))) {
                 board.addSymbol(Symbol.O, Integer.parseInt(tileX), Integer.parseInt(tileY));
-                //outputStream.write(msg.getBytes());
                 System.out.println("naught" + " " + tileX + " " + tileY);
                 for(ServerHandler handler : handlerList) {
-                    //if(!login.toString().equalsIgnoreCase(handler.getLogin()))
-                        handler.send(msg);
+                    handler.send(msg);
+                    if(board.isWin()) {
+                        System.out.println("Win");
+                        handler.send(winMsg);
+                    }
                 }
             } else {
                 for(ServerHandler handler : handlerList) {

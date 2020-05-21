@@ -13,23 +13,39 @@ import java.io.IOException;
 public class Display extends JFrame implements ActionListener {
     Client client = new Client("localhost", 8818, "guest", null);
     JButton[][] tiles = new JButton[3][3];
+    JPanel statusPanel = new JPanel();
     JPanel gamePanel = new JPanel();
+    JLabel statusLabel = new JLabel("Current turn: ");
 
     public Display() {
         client.addMessageListener(new MessageListener() {
             @Override
             public void onMessage(String login, String[] msg) {
-                System.out.println("message");
+                System.out.println(msg[0]);
                 Symbol symbol;
+                String x = "null";
+                String y = "null";
                 if(msg.length == 3) {
-                    if(msg[0].equalsIgnoreCase("addnaught"))
-                        symbol = Symbol.O;
-                    else
-                        symbol = Symbol.X;
-                    String x = msg[1];
-                    String y = msg[2];
+                    x = msg[1];
+                    y = msg[2];
+                }
+                if(msg[0].equalsIgnoreCase("addnaught")) {
+                    symbol = Symbol.O;
+                    tiles[Integer.parseInt(x)][Integer.parseInt(y)].setForeground(Color.GREEN);
                     tiles[Integer.parseInt(x)][Integer.parseInt(y)].setText(String.valueOf(symbol));
-                    tiles[Integer.parseInt(x)][Integer.parseInt(y)].setEnabled(false);
+                }
+                else if(msg[0].equalsIgnoreCase("addcross")) {
+                    symbol = Symbol.X;
+                    tiles[Integer.parseInt(x)][Integer.parseInt(y)].setForeground(Color.RED);
+                    tiles[Integer.parseInt(x)][Integer.parseInt(y)].setText(String.valueOf(symbol));
+                }
+                else if(msg[0].equalsIgnoreCase("win")) {
+                    String winner = msg[1];
+                    if(client.getSymbol().toString().equalsIgnoreCase(winner)) {
+                        JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "You win!");
+                    } else {
+                        JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "You lose!");
+                    }
                 }
             }
         });
@@ -41,21 +57,25 @@ public class Display extends JFrame implements ActionListener {
         construct();
         setLayout(new BorderLayout());
         add(gamePanel, BorderLayout.CENTER);
+        add(statusPanel, BorderLayout.NORTH);
         setTitle("Dan's Tic-Tac-Toe!");
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(400, 400, 300, 300);
+        setBounds(800, 800, 600, 600);
     }
 
     private void construct() {
         gamePanel.setLayout(new GridLayout(3, 3));
+        statusPanel.add(statusLabel);
         for (int i = 0; i < tiles.length; i++)
             for (int j = 0; j < tiles.length; j++) {
                 tiles[i][j] = new JButton();
                 tiles[i][j].putClientProperty("x", i);
                 tiles[i][j].putClientProperty("y", j);
-                tiles[i][j].setText("-");
                 tiles[i][j].addActionListener(this);
+                tiles[i][j].setFont(new Font("Arial", Font.PLAIN, 100));
+                tiles[i][j].setOpaque(false);
+                tiles[i][j].setContentAreaFilled(false);
                 gamePanel.add(tiles[i][j]);
             }
     }

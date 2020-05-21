@@ -57,6 +57,9 @@ public class Client {
 ;                    } else if("addcross".equalsIgnoreCase(cmd) || "addnaught".equalsIgnoreCase(cmd)) {
                         String[] tokenUpdate = line.split(" ", 3);
                         handleUpdate(tokenUpdate);
+                    } else if("win".equalsIgnoreCase(cmd)) {
+                        String[] tokenWin = line.split(" ", 2);
+                        handleWin(tokenWin);
                     }
                 }
         } catch (Exception e) {
@@ -67,6 +70,12 @@ public class Client {
     private void handleUpdate(String[] tokenUpdate) {
         for(MessageListener listener : messageListeners) {
             listener.onMessage(null, tokenUpdate);
+        }
+    }
+
+    private void handleWin(String[] tokenWin) {
+        for(MessageListener listener : messageListeners) {
+            listener.onMessage(null, tokenWin);
         }
     }
 
@@ -108,5 +117,8 @@ public class Client {
     }
     public String getUsername() {
         return username;
+    }
+    public Symbol getSymbol() {
+        return symbol;
     }
 }

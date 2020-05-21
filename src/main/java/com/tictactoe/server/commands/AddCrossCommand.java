@@ -18,11 +18,14 @@ public class AddCrossCommand implements Command {
             String tileY = tokens[2];
             String msg = "addcross" + " " + tileX + " " + tileY + "\n";
             String invalidTileMsg = "Invalid tile" + "\n";
+            String winMsg = "win" + " " + Symbol.X.toString() + "\n";
             if(board.isValidTile(Integer.parseInt(tileX), Integer.parseInt(tileY))) {
                 board.addSymbol(Symbol.X, Integer.parseInt(tileX), Integer.parseInt(tileY));
                 System.out.println("cross" + " " + tileX + " " + tileY);
                 for(ServerHandler handler : handlerList) {
                     handler.send(msg);
+                    if(board.isWin())
+                        handler.send(winMsg);
                 }
             } else {
                 for(ServerHandler handler : handlerList) {
