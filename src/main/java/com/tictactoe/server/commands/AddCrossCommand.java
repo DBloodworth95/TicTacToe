@@ -11,9 +11,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class AddCrossCommand implements Command {
     @Override
-    public void execute(OutputStream outputStream, String[] tokens, AtomicReference<String> login, Server server, Board board) throws IOException {
+    public void execute(OutputStream outputStream, String[] tokens, AtomicReference<String> login, Server server, Board board, AtomicReference<Integer> isTurn) throws IOException {
         List<ServerHandler> handlerList = server.getHandlers();
-        if(tokens.length == 3) {
+        if(tokens.length == 3 && Integer.parseInt(isTurn.toString()) == 2) {
             String tileX = tokens[1];
             String tileY = tokens[2];
             String msg = "addcross" + " " + tileX + " " + tileY + "\n";
@@ -24,6 +24,7 @@ public class AddCrossCommand implements Command {
                 System.out.println("cross" + " " + tileX + " " + tileY);
                 for(ServerHandler handler : handlerList) {
                     handler.send(msg);
+                    handler.getIsTurn().set(1);
                     if(board.isWin())
                         handler.send(winMsg);
                 }

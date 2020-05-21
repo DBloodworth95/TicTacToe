@@ -19,6 +19,7 @@ public class ServerHandler extends Thread {
     private Board board;
     public AtomicReference<String> login = new AtomicReference<>();
     private OutputStream sendStream;
+    public AtomicReference<Integer> isTurn = new AtomicReference<>(1);
     Map<String, Command> serverCommands = new HashMap<>();
 
 
@@ -51,7 +52,7 @@ public class ServerHandler extends Thread {
                String cmd = tokens[0];
                if(serverCommands.containsKey(cmd)) {
                    Command c = serverCommands.get(cmd);
-                   c.execute(sendStream, tokens, login, server, board);
+                   c.execute(sendStream, tokens, login, server, board, this.isTurn);
                } else {
                    String invCmd = "Invalid command: " + tokens[0] + "\n";
                    sendStream.write(invCmd.getBytes());
@@ -67,5 +68,9 @@ public class ServerHandler extends Thread {
     public void send(String msg) throws IOException {
         if(login != null)
             sendStream.write(msg.getBytes());
+    }
+
+    public AtomicReference<Integer> getIsTurn() {
+        return isTurn;
     }
 }

@@ -20,38 +20,35 @@ public class Display extends JFrame implements ActionListener {
     final JDialog finalDialogue = finalStatePane.createDialog((JFrame)null, " ");
 
     public Display() {
-        client.addMessageListener(new MessageListener() {
-            @Override
-            public void onMessage(String login, String[] msg) {
-                System.out.println(msg[0]);
-                Symbol symbol;
-                String x = "null";
-                String y = "null";
-                if(msg.length == 3) {
-                    x = msg[1];
-                    y = msg[2];
-                }
-                if(msg[0].equalsIgnoreCase("addnaught")) {
-                    symbol = Symbol.O;
-                    tiles[Integer.parseInt(x)][Integer.parseInt(y)].setForeground(Color.GREEN);
-                    tiles[Integer.parseInt(x)][Integer.parseInt(y)].setText(String.valueOf(symbol));
-                }
-                else if(msg[0].equalsIgnoreCase("addcross")) {
-                    symbol = Symbol.X;
-                    tiles[Integer.parseInt(x)][Integer.parseInt(y)].setForeground(Color.RED);
-                    tiles[Integer.parseInt(x)][Integer.parseInt(y)].setText(String.valueOf(symbol));
-                }
-                else if(msg[0].equalsIgnoreCase("win")) {
-                    String winner = msg[1];
-                    if(client.getSymbol().toString().equalsIgnoreCase(winner)) {
-                        finalDialogue.setTitle("You win!");
-                        finalDialogue.setLocationRelativeTo(getRootPane());
-                        finalDialogue.setVisible(true);
-                    } else {
-                        finalDialogue.setTitle("You lose!");
-                        finalDialogue.setLocationRelativeTo(getRootPane());
-                        finalDialogue.setVisible(true);
-                    }
+        client.addMessageListener((login, msg) -> {
+            System.out.println(msg[0]);
+            Symbol symbol;
+            String x = "null";
+            String y = "null";
+            if(msg.length == 3) {
+                x = msg[1];
+                y = msg[2];
+            }
+            if(msg[0].equalsIgnoreCase("addnaught")) {
+                symbol = Symbol.O;
+                tiles[Integer.parseInt(x)][Integer.parseInt(y)].setForeground(Color.GREEN);
+                tiles[Integer.parseInt(x)][Integer.parseInt(y)].setText(String.valueOf(symbol));
+            }
+            else if(msg[0].equalsIgnoreCase("addcross")) {
+                symbol = Symbol.X;
+                tiles[Integer.parseInt(x)][Integer.parseInt(y)].setForeground(Color.RED);
+                tiles[Integer.parseInt(x)][Integer.parseInt(y)].setText(String.valueOf(symbol));
+            }
+            else if(msg[0].equalsIgnoreCase("win")) {
+                String winner = msg[1];
+                if(client.getSymbol().toString().equalsIgnoreCase(winner)) {
+                    finalDialogue.setTitle("You win!");
+                    finalDialogue.setLocationRelativeTo(getRootPane());
+                    finalDialogue.setVisible(true);
+                } else {
+                    finalDialogue.setTitle("You lose!");
+                    finalDialogue.setLocationRelativeTo(getRootPane());
+                    finalDialogue.setVisible(true);
                 }
             }
         });

@@ -8,6 +8,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 
 public interface Command {
-    void execute(OutputStream outputStream, String[] tokens, AtomicReference<String> login, Server server, Board board) throws IOException;
+    void execute(OutputStream outputStream, String[] tokens, AtomicReference<String> login, Server server, Board board, AtomicReference<Integer> isTurn) throws IOException;
     void execute();
 }
