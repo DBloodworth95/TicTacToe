@@ -3,6 +3,7 @@ package com.tictactoe.client;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Client {
     private final String serverName;
@@ -14,8 +15,8 @@ public class Client {
     private final String username;
     private Symbol symbol;
     private SymbolAssigner symbolAssigner = new SymbolAssigner();
-    private ArrayList<LobbyStatusListener> lobbyStatusListeners = new ArrayList<>();
-    private ArrayList<MessageListener> messageListeners = new ArrayList<>();
+    private List<LobbyStatusListener> lobbyStatusListeners = new ArrayList<>();
+    private List<MessageListener> messageListeners = new ArrayList<>();
 
     public Client(String serverName, int port, String username, Symbol symbol) {
         this.serverName = serverName;

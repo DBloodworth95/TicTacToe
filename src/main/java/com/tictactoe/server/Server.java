@@ -10,7 +10,7 @@ import java.util.List;
 
 public class Server extends Thread {
     private final int port;
-    private ArrayList<ClientHandler> handlerList = new ArrayList<>();
+    private List<ClientHandler> handlerList = new ArrayList<>();
     private Board board = new Board();
 
     public Server(int port) {
