@@ -25,9 +25,6 @@ public class ServerHandler extends Thread {
         this.server = server;
         this.clientSocket = clientSocket;
         this.board = board;
-        serverCommands.put("login", new LoginCommand(sendStream, login, server, board));
-        serverCommands.put("addnaught", new AddNaughtCommand(sendStream, login, server, board));
-        serverCommands.put("addcross", new AddCrossCommand(sendStream, login, server, board));
     }
 
     @Override
@@ -42,6 +39,7 @@ public class ServerHandler extends Thread {
     private void handleClientSocket() throws IOException {
         InputStream inputStream = clientSocket.getInputStream();
         this.sendStream = clientSocket.getOutputStream();
+        assignCmds();
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         String line;
         while ((line = reader.readLine()) != null) {
@@ -66,5 +64,11 @@ public class ServerHandler extends Thread {
     public void send(String msg) throws IOException {
         if (login != null)
             sendStream.write(msg.getBytes());
+    }
+
+    private void assignCmds() {
+        serverCommands.put("login", new LoginCommand(sendStream, login, server, board));
+        serverCommands.put("addnaught", new AddNaughtCommand(sendStream, login, server, board));
+        serverCommands.put("addcross", new AddCrossCommand(sendStream, login, server, board));
     }
 }
