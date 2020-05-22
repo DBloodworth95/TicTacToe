@@ -14,7 +14,6 @@ public class Client {
     private BufferedReader bufferedReader;
     private final String username;
     private Symbol symbol;
-    private SymbolAssigner symbolAssigner = new SymbolAssigner();
     private List<LobbyStatusListener> lobbyStatusListeners = new ArrayList<>();
     private List<MessageListener> messageListeners = new ArrayList<>();
 
@@ -53,7 +52,7 @@ public class Client {
                 String[] tokens = line.split(" ");
                 String cmd = tokens[0];
                 if ("cross".equalsIgnoreCase(cmd) || "naught".equalsIgnoreCase(cmd)) {
-                    this.symbol = symbolAssigner.assign(cmd);
+                    this.symbol = SymbolAssigner.assign(cmd);
                     System.out.println(this.symbol.toString());
                     ;
                 } else if ("addcross".equalsIgnoreCase(cmd) || "addnaught".equalsIgnoreCase(cmd)) {

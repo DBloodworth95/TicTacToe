@@ -1,11 +1,12 @@
 package com.tictactoe.client;
 
-public class SymbolAssigner {
+public final class SymbolAssigner {
 
-    public Symbol assign(String cmd) {
-        if (cmd.equalsIgnoreCase("cross")) {
-            return Symbol.X;
-        } else
-            return Symbol.O;
+    public static Symbol assign(String cmd) {
+        return cmd.equalsIgnoreCase("cross") ? Symbol.X : Symbol.O;
+    }
+
+    private SymbolAssigner() {
+
     }
 }
