@@ -10,9 +10,23 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class LoginCommand implements Command {
+    private final OutputStream outputStream;
+
+    private final AtomicReference<String> login;
+
+    private final Server server;
+
+    private final Board board;
+
+    public LoginCommand(OutputStream outputStream, AtomicReference<String> login, Server server, Board board) {
+        this.outputStream = outputStream;
+        this.login = login;
+        this.server = server;
+        this.board = board;
+    }
 
     @Override
-    public void execute(OutputStream outputStream, String[] tokens, AtomicReference<String> login, Server server, Board board) throws IOException {
+    public void execute(String[] tokens) throws IOException {
         if (tokens.length == 2) {
             String loggedIn = tokens[1];
             System.out.println(loggedIn);

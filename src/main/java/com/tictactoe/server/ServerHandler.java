@@ -25,9 +25,9 @@ public class ServerHandler extends Thread {
         this.server = server;
         this.clientSocket = clientSocket;
         this.board = board;
-        serverCommands.put("login", new LoginCommand());
-        serverCommands.put("addnaught", new AddNaughtCommand());
-        serverCommands.put("addcross", new AddCrossCommand());
+        serverCommands.put("login", new LoginCommand(sendStream, login, server, board));
+        serverCommands.put("addnaught", new AddNaughtCommand(sendStream, login, server, board));
+        serverCommands.put("addcross", new AddCrossCommand(sendStream, login, server, board));
     }
 
     @Override
@@ -50,7 +50,7 @@ public class ServerHandler extends Thread {
                 String cmd = tokens[0];
                 if (serverCommands.containsKey(cmd)) {
                     Command c = serverCommands.get(cmd);
-                    c.execute(sendStream, tokens, login, server, board);
+                    c.execute(tokens);
                 } else {
                     String invCmd = "Invalid command: " + tokens[0] + "\n";
                     sendStream.write(invCmd.getBytes());
