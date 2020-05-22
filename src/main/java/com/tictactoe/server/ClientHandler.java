@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class ServerHandler extends Thread {
+public class ClientHandler extends Thread {
     private final Socket clientSocket;
     private final Server server;
     private Board board;
@@ -21,7 +21,7 @@ public class ServerHandler extends Thread {
     Map<String, Command> serverCommands = new HashMap<>();
 
 
-    public ServerHandler(Server server, Socket clientSocket, Board board) {
+    public ClientHandler(Server server, Socket clientSocket, Board board) {
         this.server = server;
         this.clientSocket = clientSocket;
         this.board = board;

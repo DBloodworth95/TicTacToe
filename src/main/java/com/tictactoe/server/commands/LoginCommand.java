@@ -2,7 +2,7 @@ package com.tictactoe.server.commands;
 
 import com.tictactoe.game.Board;
 import com.tictactoe.server.Server;
-import com.tictactoe.server.ServerHandler;
+import com.tictactoe.server.ClientHandler;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -35,8 +35,8 @@ public class LoginCommand implements Command {
             outputStream.write(msg.getBytes());
             System.out.println("User " + login + " has logged in!");
             String onlineMsg = "Online " + login + " has logged in!" + "\n";
-            List<ServerHandler> handlerList = server.getHandlers();
-            for (ServerHandler handler : handlerList) {
+            List<ClientHandler> handlerList = server.getHandlers();
+            for (ClientHandler handler : handlerList) {
                 if (!login.toString().equalsIgnoreCase(handler.getLogin())) {
                     handler.send(onlineMsg);
                 }

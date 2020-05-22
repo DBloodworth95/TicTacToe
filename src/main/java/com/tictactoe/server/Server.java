@@ -10,14 +10,14 @@ import java.util.List;
 
 public class Server extends Thread {
     private final int port;
-    private ArrayList<ServerHandler> handlerList = new ArrayList<>();
+    private ArrayList<ClientHandler> handlerList = new ArrayList<>();
     private Board board = new Board();
 
     public Server(int port) {
         this.port = port;
     }
 
-    public List<ServerHandler> getHandlers() {
+    public List<ClientHandler> getHandlers() {
         return handlerList;
     }
 
@@ -29,7 +29,7 @@ public class Server extends Thread {
                 System.out.println("Accepting client connections..");
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("Accepting connection from " + clientSocket);
-                ServerHandler handler = new ServerHandler(this, clientSocket, board);
+                ClientHandler handler = new ClientHandler(this, clientSocket, board);
                 handlerList.add(handler);
                 handler.start();
             }
@@ -38,7 +38,7 @@ public class Server extends Thread {
         }
     }
 
-    public void removeHandler(ServerHandler handler) {
+    public void removeHandler(ClientHandler handler) {
         handlerList.remove(handler);
     }
 }
