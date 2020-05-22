@@ -11,13 +11,16 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 
 public class Display extends JFrame implements ActionListener {
-    Client client = new Client("localhost", 8818, "guest", null);
-    JButton[][] tiles = new JButton[3][3];
+    final JOptionPane finalStatePane = new JOptionPane(" ");
+    final JDialog finalDialogue = finalStatePane.createDialog((JFrame) null, " ");
+    static final int BOARD_LENGTH = 3;
+    static final int BOARD_WIDTH = 3;
+    static final int PORT = 8818;
+    Client client = new Client("localhost", PORT, "guest", null);
+    JButton[][] tiles = new JButton[BOARD_LENGTH][BOARD_WIDTH];
     JPanel statusPanel = new JPanel();
     JPanel gamePanel = new JPanel();
     JLabel statusLabel = new JLabel("Current turn: ");
-    final JOptionPane finalStatePane = new JOptionPane(" ");
-    final JDialog finalDialogue = finalStatePane.createDialog((JFrame) null, " ");
 
     public Display() {
         client.addMessageListener((login, msg) -> {
@@ -68,10 +71,10 @@ public class Display extends JFrame implements ActionListener {
     }
 
     private void construct() {
-        gamePanel.setLayout(new GridLayout(3, 3));
+        gamePanel.setLayout(new GridLayout(BOARD_LENGTH, BOARD_WIDTH));
         statusPanel.add(statusLabel);
-        for (int i = 0; i < tiles.length; i++)
-            for (int j = 0; j < tiles.length; j++) {
+        for (int i = 0; i < BOARD_LENGTH; i++)
+            for (int j = 0; j < BOARD_WIDTH; j++) {
                 tiles[i][j] = new JButton();
                 tiles[i][j].putClientProperty("x", i);
                 tiles[i][j].putClientProperty("y", j);

@@ -5,9 +5,11 @@ import com.tictactoe.client.Symbol;
 public class Board {
     private Symbol[][] tiles;
     private int isTurn;
+    private static final int BOARD_WIDTH = 3;
+    private static final int BOARD_LENGTH = 3;
 
     public Board() {
-        tiles = new Symbol[3][3];
+        tiles = new Symbol[BOARD_LENGTH][BOARD_WIDTH];
         this.isTurn = 1;
     }
 
