@@ -12,6 +12,7 @@ public class Server extends Thread {
     private final int port;
     private ArrayList<ServerHandler> handlerList = new ArrayList<>();
     private Board board = new Board();
+
     public Server(int port) {
         this.port = port;
     }
@@ -24,7 +25,7 @@ public class Server extends Thread {
     public void run() {
         try {
             ServerSocket serverSocket = new ServerSocket(port);
-            while(true) {
+            while (true) {
                 System.out.println("Accepting client connections..");
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("Accepting connection from " + clientSocket);

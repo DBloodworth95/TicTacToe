@@ -28,7 +28,7 @@ public class Client {
         String cmd = "login " + login + " " + "\n";
         outputStream.write(cmd.getBytes());
         String response = bufferedReader.readLine();
-        if("online".equalsIgnoreCase(response)) {
+        if ("online".equalsIgnoreCase(response)) {
             startMessageReader();
             return true;
         } else
@@ -48,33 +48,34 @@ public class Client {
     public void readMessageLoop() {
         try {
             String line;
-            while((line = bufferedReader.readLine()) != null) {
+            while ((line = bufferedReader.readLine()) != null) {
                 String[] tokens = line.split(" ");
-                    String cmd = tokens[0];
-                    if("cross".equalsIgnoreCase(cmd) || "naught".equalsIgnoreCase(cmd)) {
-                        this.symbol = symbolAssigner.assign(cmd);
-                        System.out.println(this.symbol.toString());
-;                    } else if("addcross".equalsIgnoreCase(cmd) || "addnaught".equalsIgnoreCase(cmd)) {
-                        String[] tokenUpdate = line.split(" ", 3);
-                        handleUpdate(tokenUpdate);
-                    } else if("win".equalsIgnoreCase(cmd)) {
-                        String[] tokenWin = line.split(" ", 2);
-                        handleWin(tokenWin);
-                    }
+                String cmd = tokens[0];
+                if ("cross".equalsIgnoreCase(cmd) || "naught".equalsIgnoreCase(cmd)) {
+                    this.symbol = symbolAssigner.assign(cmd);
+                    System.out.println(this.symbol.toString());
+                    ;
+                } else if ("addcross".equalsIgnoreCase(cmd) || "addnaught".equalsIgnoreCase(cmd)) {
+                    String[] tokenUpdate = line.split(" ", 3);
+                    handleUpdate(tokenUpdate);
+                } else if ("win".equalsIgnoreCase(cmd)) {
+                    String[] tokenWin = line.split(" ", 2);
+                    handleWin(tokenWin);
                 }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     private void handleUpdate(String[] tokenUpdate) {
-        for(MessageListener listener : messageListeners) {
+        for (MessageListener listener : messageListeners) {
             listener.onMessage(null, tokenUpdate);
         }
     }
 
     private void handleWin(String[] tokenWin) {
-        for(MessageListener listener : messageListeners) {
+        for (MessageListener listener : messageListeners) {
             listener.onMessage(null, tokenWin);
         }
     }
@@ -106,18 +107,23 @@ public class Client {
     public void addLobbyStatusListener(LobbyStatusListener listener) {
         lobbyStatusListeners.add(listener);
     }
+
     public void removeLobbyStatusListener(LobbyStatusListener listener) {
         lobbyStatusListeners.remove(listener);
     }
+
     public void addMessageListener(MessageListener messageListener) {
         messageListeners.add(messageListener);
     }
+
     public void removeMessageListener(MessageListener messageListener) {
         messageListeners.remove(messageListener);
     }
+
     public String getUsername() {
         return username;
     }
+
     public Symbol getSymbol() {
         return symbol;
     }

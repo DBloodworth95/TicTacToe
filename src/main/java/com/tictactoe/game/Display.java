@@ -17,7 +17,7 @@ public class Display extends JFrame implements ActionListener {
     JPanel gamePanel = new JPanel();
     JLabel statusLabel = new JLabel("Current turn: ");
     final JOptionPane finalStatePane = new JOptionPane(" ");
-    final JDialog finalDialogue = finalStatePane.createDialog((JFrame)null, " ");
+    final JDialog finalDialogue = finalStatePane.createDialog((JFrame) null, " ");
 
     public Display() {
         client.addMessageListener((login, msg) -> {
@@ -25,25 +25,23 @@ public class Display extends JFrame implements ActionListener {
             Symbol symbol;
             String x = "null";
             String y = "null";
-            if(msg.length == 3) {
+            if (msg.length == 3) {
                 x = msg[1];
                 y = msg[2];
             }
-            if(msg[0].equalsIgnoreCase("addnaught")) {
+            if (msg[0].equalsIgnoreCase("addnaught")) {
                 symbol = Symbol.O;
                 tiles[Integer.parseInt(x)][Integer.parseInt(y)].setForeground(Color.GREEN);
                 tiles[Integer.parseInt(x)][Integer.parseInt(y)].setText(String.valueOf(symbol));
                 statusLabel.setText("Current turn: Cross");
-            }
-            else if(msg[0].equalsIgnoreCase("addcross")) {
+            } else if (msg[0].equalsIgnoreCase("addcross")) {
                 symbol = Symbol.X;
                 tiles[Integer.parseInt(x)][Integer.parseInt(y)].setForeground(Color.RED);
                 tiles[Integer.parseInt(x)][Integer.parseInt(y)].setText(String.valueOf(symbol));
                 statusLabel.setText("Current turn: Naught");
-            }
-            else if(msg[0].equalsIgnoreCase("win")) {
+            } else if (msg[0].equalsIgnoreCase("win")) {
                 String winner = msg[1];
-                if(client.getSymbol().toString().equalsIgnoreCase(winner)) {
+                if (client.getSymbol().toString().equalsIgnoreCase(winner)) {
                     finalDialogue.setTitle("You win!");
                     finalDialogue.setLocationRelativeTo(getRootPane());
                     finalDialogue.setVisible(true);
