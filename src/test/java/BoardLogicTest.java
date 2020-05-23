@@ -9,12 +9,14 @@ public class BoardLogicTest {
         Board board = new Board();
         Assert.assertTrue(board.addSymbol(Symbol.X, 1, 1));
     }
+
     @Test
     public void testAddSymbolFail() {
         Board board = new Board();
         board.addSymbol(Symbol.X, 1, 1);
         Assert.assertFalse(board.addSymbol(Symbol.X, 1, 1));
     }
+
     @Test
     public void testWin() {
         Board board = new Board();
@@ -23,6 +25,7 @@ public class BoardLogicTest {
         board.addSymbol(Symbol.X, 1, 2);
         Assert.assertTrue(board.isWin());
     }
+
     @Test
     public void testGetTurn() {
         Board board = new Board();
