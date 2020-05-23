@@ -60,4 +60,8 @@ public class Board {
     public int getIsTurn() {
         return isTurn;
     }
+
+    public Symbol getSymbolAt(int x, int y) {
+        return tiles[x][y];
+    }
 }

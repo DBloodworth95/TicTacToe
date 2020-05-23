@@ -3,18 +3,21 @@ import com.tictactoe.game.Board;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class BoardLogicTest {
+public class BoardTest {
+
     @Test
     public void testAddSymbol() {
         Board board = new Board();
-        Assert.assertTrue(board.addSymbol(Symbol.X, 1, 1));
+        board.addSymbol(Symbol.X, 1, 1);
+        Assert.assertEquals(Symbol.X, board.getSymbolAt(1, 1));
     }
 
     @Test
     public void testAddSymbolFail() {
         Board board = new Board();
         board.addSymbol(Symbol.X, 1, 1);
-        Assert.assertFalse(board.addSymbol(Symbol.X, 1, 1));
+        board.addSymbol(Symbol.O, 1, 1);
+        Assert.assertEquals(Symbol.X, board.getSymbolAt(1, 1));
     }
 
     @Test
