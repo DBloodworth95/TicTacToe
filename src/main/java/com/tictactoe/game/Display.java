@@ -46,13 +46,11 @@ public class Display extends JFrame implements ActionListener {
                 String winner = msg[1];
                 if (client.getSymbol().toString().equalsIgnoreCase(winner)) {
                     finalDialogue.setTitle("You win!");
-                    finalDialogue.setLocationRelativeTo(getRootPane());
-                    finalDialogue.setVisible(true);
                 } else {
                     finalDialogue.setTitle("You lose!");
-                    finalDialogue.setLocationRelativeTo(getRootPane());
-                    finalDialogue.setVisible(true);
                 }
+                finalDialogue.setLocationRelativeTo(getRootPane());
+                finalDialogue.setVisible(true);
             }
         });
     }
