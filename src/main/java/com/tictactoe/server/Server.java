@@ -37,8 +37,4 @@ public class Server extends Thread {
             e.printStackTrace();
         }
     }
-
-    public void removeHandler(ClientHandler handler) {
-        handlerList.remove(handler);
-    }
 }

@@ -57,10 +57,6 @@ public class Board {
         return ((s1 != null) && (s1 == s2) && (s2 == s3));
     }
 
-    public Symbol[][] getTiles() {
-        return tiles;
-    }
-
     public int getIsTurn() {
         return isTurn;
     }
