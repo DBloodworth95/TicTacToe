@@ -16,6 +16,7 @@ public class Client {
     private Symbol symbol;
     private List<LobbyStatusListener> lobbyStatusListeners = new ArrayList<>();
     private List<MessageListener> messageListeners = new ArrayList<>();
+    private static boolean stopRequested;
 
     public Client(String serverName, int port, String username, Symbol symbol) {
         this.serverName = serverName;
@@ -35,14 +36,21 @@ public class Client {
             return false;
     }
 
+    private static synchronized void requestStop() {
+        stopRequested = true;
+    }
+
+    private static synchronized boolean stopRequested() {
+        return stopRequested;
+    }
+
     public void startMessageReader() {
-        Thread t = new Thread() {
-            @Override
-            public void run() {
+        Thread t = new Thread(() -> {
+            while (!stopRequested())
                 readMessageLoop();
-            }
-        };
+        });
         t.start();
+        //requestStop();
     }
 
     public void readMessageLoop() {

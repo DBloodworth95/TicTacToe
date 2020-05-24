@@ -32,6 +32,7 @@ public class BoardTest {
     @Test
     public void testGetTurn() {
         Board board = new Board();
-        Assert.assertEquals(1, board.getIsTurn());
+        board.addSymbol(Symbol.X, 1, 0);
+        Assert.assertEquals(2, board.getIsTurn());
     }
 }
