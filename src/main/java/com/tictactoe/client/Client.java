@@ -1,9 +1,12 @@
 package com.tictactoe.client;
 
+import javax.swing.*;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+
+import static javax.swing.SwingUtilities.invokeLater;
 
 public class Client {
     private final String serverName;
@@ -36,21 +39,9 @@ public class Client {
             return false;
     }
 
-    private static synchronized void requestStop() {
-        stopRequested = true;
-    }
-
-    private static synchronized boolean stopRequested() {
-        return stopRequested;
-    }
-
     public void startMessageReader() {
-        Thread t = new Thread(() -> {
-            while (!stopRequested())
-                readMessageLoop();
-        });
+        Thread t = new Thread(this::readMessageLoop);
         t.start();
-        //requestStop();
     }
 
     public void readMessageLoop() {
@@ -59,17 +50,20 @@ public class Client {
             while ((line = bufferedReader.readLine()) != null) {
                 String[] tokens = line.split(" ");
                 String cmd = tokens[0];
-                if ("cross".equalsIgnoreCase(cmd) || "naught".equalsIgnoreCase(cmd)) {
-                    this.symbol = SymbolAssigner.assign(cmd);
-                    System.out.println(this.symbol.toString());
-                    ;
-                } else if ("addcross".equalsIgnoreCase(cmd) || "addnaught".equalsIgnoreCase(cmd)) {
-                    String[] tokenUpdate = line.split(" ", 3);
-                    handleUpdate(tokenUpdate);
-                } else if ("win".equalsIgnoreCase(cmd)) {
-                    String[] tokenWin = line.split(" ", 2);
-                    handleWin(tokenWin);
-                }
+                String finalLine = line;
+                invokeLater(() -> {
+                    if ("cross".equalsIgnoreCase(cmd) || "naught".equalsIgnoreCase(cmd)) {
+                        this.symbol = SymbolAssigner.assign(cmd);
+                        System.out.println(this.symbol.toString());
+
+                    } else if ("addcross".equalsIgnoreCase(cmd) || "addnaught".equalsIgnoreCase(cmd)) {
+                        String[] tokenUpdate = finalLine.split(" ", 3);
+                        handleUpdate(tokenUpdate);
+                    } else if ("win".equalsIgnoreCase(cmd)) {
+                        String[] tokenWin = finalLine.split(" ", 2);
+                        handleWin(tokenWin);
+                    }
+                });
             }
         } catch (Exception e) {
             e.printStackTrace();
