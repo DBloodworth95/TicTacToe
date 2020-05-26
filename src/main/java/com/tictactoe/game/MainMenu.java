@@ -17,16 +17,16 @@ public class MainMenu extends JFrame implements ActionListener {
     private Display display;
 
     public void construct() {
-        title.setBounds(170,50,250,10);
+        title.setBounds(170, 50, 250, 10);
         usernameL.setBounds(170, 252, 100, 10);
         usernameTF.setBounds(300, 250, 150, 20);
-        playB.setBounds(245, 400, 100,20);
+        playB.setBounds(245, 400, 100, 20);
         add(title);
         add(usernameL);
         add(usernameTF);
         add(playB);
         playB.addActionListener(this);
-        setSize(600,600);
+        setSize(600, 600);
         setLayout(null);
         setVisible(true);
         setResizable(false);
@@ -37,7 +37,7 @@ public class MainMenu extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        if(actionEvent.getSource() == playB) {
+        if (actionEvent.getSource() == playB) {
             display = new Display(usernameTF.getText());
             setVisible(false);
             try {
