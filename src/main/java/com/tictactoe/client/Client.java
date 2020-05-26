@@ -2,11 +2,8 @@ package com.tictactoe.client;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
 
 import static javax.swing.SwingUtilities.invokeLater;
 
@@ -22,6 +19,7 @@ public class Client {
     private Symbol symbol;
     private List<LobbyStatusListener> lobbyStatusListeners = new ArrayList<>();
     private List<MessageListener> messageListeners = new ArrayList<>();
+    private final BlockingQueue<String> msgPipe = new ArrayBlockingQueue<>(10);
 
     public Client(String serverName, int port, String username, Symbol symbol) {
         this.serverName = serverName;
@@ -44,6 +42,27 @@ public class Client {
     public void startMessageReader() {
         Thread t = new Thread(this::readMessageLoop);
         t.start();
+        Thread w = new Thread(this::startMsgWriter);
+        w.start();
+        startHeartBeat();
+    }
+
+    public void startHeartBeat() {
+        Thread h = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+                        msgPipe.put("isalive");
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("Sent hb");
+                }
+            }
+        });
+        h.start();
     }
 
 
@@ -105,7 +124,8 @@ public class Client {
             symbolCmd = "addnaught";
         String cmd = symbolCmd + " " + x + " " + y + "\n";
         System.out.println(cmd);
-        outputStream.write(cmd.getBytes());
+        //outputStream.write(cmd.getBytes());
+        msgPipe.offer(cmd);
     }
 
     public void addMessageListener(MessageListener messageListener) {
@@ -114,5 +134,17 @@ public class Client {
 
     public Symbol getSymbol() {
         return symbol;
+    }
+
+    public void startMsgWriter() {
+        while (true) {
+            try {
+                while (!msgPipe.isEmpty()) {
+                    outputStream.write(msgPipe.take().getBytes());
+                }
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

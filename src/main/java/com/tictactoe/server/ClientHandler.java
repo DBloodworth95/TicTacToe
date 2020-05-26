@@ -22,22 +22,20 @@ public class ClientHandler extends Thread {
         this.server = server;
         this.clientSocket = clientSocket;
         this.board = board;
-
     }
 
     @Override
     public void run() {
         try {
             handleClientSocket();
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    private void handleClientSocket() throws IOException {
+    private void handleClientSocket() throws IOException, InterruptedException {
         InputStream inputStream = clientSocket.getInputStream();
         this.sendStream = clientSocket.getOutputStream();
-
         assignCmds();
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         String line;
