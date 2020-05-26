@@ -1,4 +1,4 @@
 rootProject.name = 'TicTacToe'
-
+include 'server'
 
 

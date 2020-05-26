@@ -1,10 +1,7 @@
 package com.tictactoe.server;
 
 import com.tictactoe.game.Board;
-import com.tictactoe.server.commands.AddCrossCommand;
-import com.tictactoe.server.commands.AddNaughtCommand;
-import com.tictactoe.server.commands.Command;
-import com.tictactoe.server.commands.LoginCommand;
+import com.tictactoe.server.commands.*;
 
 import java.io.*;
 import java.net.Socket;
@@ -25,6 +22,7 @@ public class ClientHandler extends Thread {
         this.server = server;
         this.clientSocket = clientSocket;
         this.board = board;
+
     }
 
     @Override
@@ -39,6 +37,7 @@ public class ClientHandler extends Thread {
     private void handleClientSocket() throws IOException {
         InputStream inputStream = clientSocket.getInputStream();
         this.sendStream = clientSocket.getOutputStream();
+
         assignCmds();
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         String line;

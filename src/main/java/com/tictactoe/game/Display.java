@@ -1,7 +1,6 @@
 package com.tictactoe.game;
 
 import com.tictactoe.client.Client;
-import com.tictactoe.client.MessageListener;
 import com.tictactoe.client.Symbol;
 
 import javax.swing.*;
@@ -10,13 +9,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 
+
 public class Display extends JFrame implements ActionListener {
     final JOptionPane finalStatePane = new JOptionPane(" ");
     final JDialog finalDialogue = finalStatePane.createDialog((JFrame) null, " ");
     static final int BOARD_LENGTH = 3;
     static final int BOARD_WIDTH = 3;
     static final int PORT = 8818;
-    Client client = new Client("localhost", PORT, "guest", null);
+    final Client client = new Client("localhost", PORT, "guest", null);
     JButton[][] tiles = new JButton[BOARD_LENGTH][BOARD_WIDTH];
     JPanel statusPanel = new JPanel();
     JPanel gamePanel = new JPanel();
@@ -56,8 +56,9 @@ public class Display extends JFrame implements ActionListener {
     }
 
     public void initialize() throws IOException {
-        client.connect();
-        client.login("guest");
+        if (client.connect()) {
+            client.login("guest");
+        }
         construct();
         setLayout(new BorderLayout());
         add(gamePanel, BorderLayout.CENTER);

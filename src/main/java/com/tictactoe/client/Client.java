@@ -1,14 +1,17 @@
 package com.tictactoe.client;
 
-import javax.swing.*;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import static javax.swing.SwingUtilities.invokeLater;
 
 public class Client {
+
     private final String serverName;
     private final int port;
     private Socket socket;
@@ -19,7 +22,6 @@ public class Client {
     private Symbol symbol;
     private List<LobbyStatusListener> lobbyStatusListeners = new ArrayList<>();
     private List<MessageListener> messageListeners = new ArrayList<>();
-    private static boolean stopRequested;
 
     public Client(String serverName, int port, String username, Symbol symbol) {
         this.serverName = serverName;
@@ -44,6 +46,7 @@ public class Client {
         t.start();
     }
 
+
     public void readMessageLoop() {
         try {
             String line;
@@ -55,7 +58,6 @@ public class Client {
                     if ("cross".equalsIgnoreCase(cmd) || "naught".equalsIgnoreCase(cmd)) {
                         this.symbol = SymbolAssigner.assign(cmd);
                         System.out.println(this.symbol.toString());
-
                     } else if ("addcross".equalsIgnoreCase(cmd) || "addnaught".equalsIgnoreCase(cmd)) {
                         String[] tokenUpdate = finalLine.split(" ", 3);
                         handleUpdate(tokenUpdate);
@@ -106,24 +108,8 @@ public class Client {
         outputStream.write(cmd.getBytes());
     }
 
-    public void addLobbyStatusListener(LobbyStatusListener listener) {
-        lobbyStatusListeners.add(listener);
-    }
-
-    public void removeLobbyStatusListener(LobbyStatusListener listener) {
-        lobbyStatusListeners.remove(listener);
-    }
-
     public void addMessageListener(MessageListener messageListener) {
         messageListeners.add(messageListener);
-    }
-
-    public void removeMessageListener(MessageListener messageListener) {
-        messageListeners.remove(messageListener);
-    }
-
-    public String getUsername() {
-        return username;
     }
 
     public Symbol getSymbol() {
