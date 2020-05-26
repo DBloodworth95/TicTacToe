@@ -13,6 +13,7 @@ import java.io.IOException;
 public class Display extends JFrame implements ActionListener {
     final JOptionPane finalStatePane = new JOptionPane(" ");
     final JDialog finalDialogue = finalStatePane.createDialog((JFrame) null, " ");
+    final String username;
     static final int BOARD_LENGTH = 3;
     static final int BOARD_WIDTH = 3;
     static final int PORT = 8818;
@@ -22,7 +23,8 @@ public class Display extends JFrame implements ActionListener {
     JPanel gamePanel = new JPanel();
     JLabel statusLabel = new JLabel("Current turn: ");
 
-    public Display() {
+    public Display(String username) {
+        this.username = username;
         client.addMessageListener((login, msg) -> {
             System.out.println(msg[0]);
             Symbol symbol;
@@ -57,7 +59,7 @@ public class Display extends JFrame implements ActionListener {
 
     public void initialize() throws IOException {
         if (client.connect()) {
-            client.login("guest");
+            client.login(username);
         }
         construct();
         setLayout(new BorderLayout());

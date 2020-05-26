@@ -1,9 +1,9 @@
 package com.tictactoe.game;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 public class MainMenu extends JFrame implements ActionListener {
 
@@ -14,9 +14,7 @@ public class MainMenu extends JFrame implements ActionListener {
 
     private final JButton playB = new JButton("Play!");
 
-    private static final int WIDTH = 3;
-
-    private static final int HEIGHT = 3;
+    private Display display;
 
     public void construct() {
         title.setBounds(170,50,250,10);
@@ -27,19 +25,26 @@ public class MainMenu extends JFrame implements ActionListener {
         add(usernameL);
         add(usernameTF);
         add(playB);
+        playB.addActionListener(this);
         setSize(600,600);
         setLayout(null);
         setVisible(true);
+        setResizable(false);
         setTitle("Dan's Tic-Tac-Toe!");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
 
-
-
-
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-
+        if(actionEvent.getSource() == playB) {
+            display = new Display(usernameTF.getText());
+            setVisible(false);
+            try {
+                display.initialize();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
