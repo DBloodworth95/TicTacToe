@@ -53,6 +53,7 @@ public class Client {
         try {
             while (true) {
                 msgPipe.offer("isalive" + "\n");
+                System.out.println("Sending heartbeat to server");
                 Thread.sleep(TimeUnit.SECONDS.toMillis(5));
             }
         } catch (InterruptedException e) {
@@ -68,7 +69,6 @@ public class Client {
                 String[] tokens = line.split(" ");
                 String cmd = tokens[0];
                 String finalLine = line;
-                System.out.println("Read line");
                 invokeLater(() -> {
                     if ("cross".equalsIgnoreCase(cmd) || "naught".equalsIgnoreCase(cmd)) {
                         this.symbol = SymbolAssigner.assign(cmd);
@@ -91,7 +91,6 @@ public class Client {
     private void handleUpdate(String[] tokenUpdate) {
         for (MessageListener listener : messageListeners) {
             listener.onMessage(null, tokenUpdate);
-            System.out.println("Sending to listeners");
         }
     }
 
@@ -114,7 +113,7 @@ public class Client {
         return false;
     }
 
-    public void requestSymbol(int x, int y) throws IOException {
+    public void requestSymbol(int x, int y) {
         String symbolCmd;
         if (symbol.toString().equalsIgnoreCase("x"))
             symbolCmd = "addcross";
@@ -138,7 +137,6 @@ public class Client {
             try {
                 String msg = msgPipe.take();
                 outputStream.write(msg.getBytes());
-                System.out.println("writing message to server");
             } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             }

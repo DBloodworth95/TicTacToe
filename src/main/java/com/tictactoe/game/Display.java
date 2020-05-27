@@ -26,7 +26,6 @@ public class Display extends JFrame implements ActionListener {
     public Display(String username) {
         this.username = username;
         client.addMessageListener((login, msg) -> {
-            System.out.println("Adding symbol to display");
             Symbol symbol;
             String x = "null";
             String y = "null";
@@ -92,10 +91,6 @@ public class Display extends JFrame implements ActionListener {
         JButton clickedButton = (JButton) e.getSource();
         Integer x = (Integer) clickedButton.getClientProperty("x");
         Integer y = (Integer) clickedButton.getClientProperty("y");
-        try {
-            client.requestSymbol(x, y);
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
-        }
+        client.requestSymbol(x, y);
     }
 }
