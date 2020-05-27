@@ -1,4 +1,5 @@
 rootProject.name = 'TicTacToe'
+include 'client'
 include 'server'
-
+include 'shared'
 
