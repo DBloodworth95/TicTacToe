@@ -19,6 +19,7 @@ public class AddCrossCommand implements Command {
 
     private final Board board;
 
+
     public AddCrossCommand(OutputStream outputStream, AtomicReference<String> login, Server server, Board board) {
         this.outputStream = outputStream;
         this.login = login;

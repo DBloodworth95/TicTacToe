@@ -19,7 +19,8 @@ public class Client {
     private Symbol symbol;
     private List<LobbyStatusListener> lobbyStatusListeners = new ArrayList<>();
     private List<MessageListener> messageListeners = new ArrayList<>();
-    private final BlockingQueue<String> msgPipe = new ArrayBlockingQueue<>(10);
+    private final BlockingQueue<String> msgPipe = new ArrayBlockingQueue<>(100);
+
 
     public Client(String serverName, int port, String username, Symbol symbol) {
         this.serverName = serverName;
@@ -41,28 +42,23 @@ public class Client {
 
     public void startMessageReader() {
         Thread t = new Thread(this::readMessageLoop);
-        t.start();
         Thread w = new Thread(this::startMsgWriter);
+        Thread h = new Thread(this::startHeartBeat);
+        t.start();
         w.start();
-        startHeartBeat();
+        h.start();
     }
 
     public void startHeartBeat() {
-        Thread h = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        msgPipe.put("isalive");
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    System.out.println("Sent hb");
-                }
+        try {
+            while (true) {
+                msgPipe.put("isalive");
+                System.out.println("Sent hb to pipe");
+                Thread.sleep(TimeUnit.SECONDS.toMillis(5));
             }
-        });
-        h.start();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -125,7 +121,11 @@ public class Client {
         String cmd = symbolCmd + " " + x + " " + y + "\n";
         System.out.println(cmd);
         //outputStream.write(cmd.getBytes());
-        msgPipe.offer(cmd);
+        try {
+            msgPipe.put(cmd);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void addMessageListener(MessageListener messageListener) {
@@ -139,9 +139,9 @@ public class Client {
     public void startMsgWriter() {
         while (true) {
             try {
-                while (!msgPipe.isEmpty()) {
-                    outputStream.write(msgPipe.take().getBytes());
-                }
+                String msg = msgPipe.take();
+                outputStream.write(msg.getBytes());
+                System.out.println("writing message to server");
             } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             }

@@ -26,7 +26,7 @@ public class Display extends JFrame implements ActionListener {
     public Display(String username) {
         this.username = username;
         client.addMessageListener((login, msg) -> {
-            System.out.println(msg[0]);
+            System.out.println("Adding symbol to display");
             Symbol symbol;
             String x = "null";
             String y = "null";

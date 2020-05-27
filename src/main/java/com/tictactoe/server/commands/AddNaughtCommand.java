@@ -37,7 +37,7 @@ public class AddNaughtCommand implements Command {
             String winMsg = "win" + " " + Symbol.O.toString() + "\n";
             if (board.isValidTile(Integer.parseInt(tileX), Integer.parseInt(tileY))) {
                 board.addSymbol(Symbol.O, Integer.parseInt(tileX), Integer.parseInt(tileY));
-                System.out.println("naught" + " " + tileX + " " + tileY);
+                System.out.println("naught recieved");
                 for (ClientHandler handler : handlerList) {
                     handler.send(msg);
                     if (board.isWin()) {
