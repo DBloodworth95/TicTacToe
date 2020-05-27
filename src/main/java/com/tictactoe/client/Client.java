@@ -52,8 +52,7 @@ public class Client {
     public void startHeartBeat() {
         try {
             while (true) {
-                msgPipe.put("isalive");
-                System.out.println("Sent hb to pipe");
+                msgPipe.offer("isalive" + "\n");
                 Thread.sleep(TimeUnit.SECONDS.toMillis(5));
             }
         } catch (InterruptedException e) {
@@ -69,12 +68,14 @@ public class Client {
                 String[] tokens = line.split(" ");
                 String cmd = tokens[0];
                 String finalLine = line;
+                System.out.println("Read line");
                 invokeLater(() -> {
                     if ("cross".equalsIgnoreCase(cmd) || "naught".equalsIgnoreCase(cmd)) {
                         this.symbol = SymbolAssigner.assign(cmd);
                         System.out.println(this.symbol.toString());
                     } else if ("addcross".equalsIgnoreCase(cmd) || "addnaught".equalsIgnoreCase(cmd)) {
                         String[] tokenUpdate = finalLine.split(" ", 3);
+                        System.out.println("Command read");
                         handleUpdate(tokenUpdate);
                     } else if ("win".equalsIgnoreCase(cmd)) {
                         String[] tokenWin = finalLine.split(" ", 2);
@@ -90,6 +91,7 @@ public class Client {
     private void handleUpdate(String[] tokenUpdate) {
         for (MessageListener listener : messageListeners) {
             listener.onMessage(null, tokenUpdate);
+            System.out.println("Sending to listeners");
         }
     }
 
@@ -120,12 +122,7 @@ public class Client {
             symbolCmd = "addnaught";
         String cmd = symbolCmd + " " + x + " " + y + "\n";
         System.out.println(cmd);
-        //outputStream.write(cmd.getBytes());
-        try {
-            msgPipe.put(cmd);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        msgPipe.offer(cmd);
     }
 
     public void addMessageListener(MessageListener messageListener) {

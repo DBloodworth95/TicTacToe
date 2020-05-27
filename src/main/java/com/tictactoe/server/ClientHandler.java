@@ -46,8 +46,8 @@ public class ClientHandler extends Thread {
                 String[] tokens = line.split(" ");
                 if (tokens.length > 0) {
                     String cmd = tokens[0];
+                    System.out.println(serverCommands.containsKey(cmd));
                     if (serverCommands.containsKey(cmd)) {
-                        System.out.println("Found command");
                         Command c = serverCommands.get(cmd);
                         try {
                             c.execute(tokens);
@@ -56,11 +56,7 @@ public class ClientHandler extends Thread {
                         }
                     } else {
                         String invCmd = "Invalid command: " + tokens[0] + "\n";
-                        try {
-                            msgPipe.put(invCmd);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                        msgPipe.offer(invCmd);
                     }
                 }
             }
@@ -75,12 +71,7 @@ public class ClientHandler extends Thread {
 
     public void send(String msg) {
         if (login != null) {
-            try {
-                msgPipe.put(msg);
-                System.out.println("Writing message to pipeline");
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            msgPipe.offer(msg);
         }
     }
 
@@ -89,7 +80,6 @@ public class ClientHandler extends Thread {
             while (true) {
                 String msg = msgPipe.take();
                 sendStream.write(msg.getBytes());
-                System.out.println("Writing message to client");
             }
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();
