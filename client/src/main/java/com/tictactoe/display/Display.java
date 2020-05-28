@@ -55,6 +55,10 @@ public class Display extends JFrame implements ActionListener {
                 }
                 finalDialogue.setLocationRelativeTo(getRootPane());
                 finalDialogue.setVisible(true);
+            } else if (msg[0].equalsIgnoreCase("isalive")) {
+                System.out.println("I'm still connected");
+            } else if (msg[0].equalsIgnoreCase("disconnect")) {
+                System.out.println("I disconnected");
             }
         });
     }

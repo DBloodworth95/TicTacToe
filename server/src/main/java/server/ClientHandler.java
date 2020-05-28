@@ -1,9 +1,6 @@
 package server;
 
-import server.command.AddCrossCommand;
-import server.command.AddNaughtCommand;
-import server.command.Command;
-import server.command.LoginCommand;
+import server.command.*;
 
 import java.io.*;
 import java.net.Socket;
@@ -92,5 +89,6 @@ public class ClientHandler extends Thread {
         serverCommands.put("login", new LoginCommand(sendStream, login, server, board));
         serverCommands.put("addnaught", new AddNaughtCommand(sendStream, login, server, board));
         serverCommands.put("addcross", new AddCrossCommand(sendStream, login, server, board));
+        serverCommands.put("isalive", new Heartbeat(sendStream, login, server));
     }
 }

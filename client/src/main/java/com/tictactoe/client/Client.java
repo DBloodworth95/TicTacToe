@@ -2,6 +2,7 @@ package com.tictactoe.client;
 
 import com.tictactoe.client.command.AddSymbol;
 import com.tictactoe.client.command.Command;
+import com.tictactoe.client.command.Heartbeat;
 import com.tictactoe.client.command.Win;
 import com.tictactoe.symbol.Symbol;
 
@@ -20,11 +21,12 @@ public class Client {
     private OutputStream outputStream;
     private InputStream inputStream;
     private BufferedReader bufferedReader;
-    private final String username;
+    private String username;
     private Symbol symbol;
     private List<LobbyStatusListener> lobbyStatusListeners = new ArrayList<>();
     private List<MessageListener> messageListeners = new ArrayList<>();
-    private final BlockingQueue<String> msgPipe = new ArrayBlockingQueue<>(100);
+    private final BlockingQueue<String> msgPipe = new ArrayBlockingQueue<>(10);
+    private final BlockingQueue<String> heartbeatPipe = new ArrayBlockingQueue<>(1);
     private Map<String, Command> clientCommands = new HashMap<>();
 
 
@@ -35,8 +37,22 @@ public class Client {
         this.symbol = symbol;
     }
 
+    public boolean connect() {
+        try {
+            this.socket = new Socket(serverName, port);
+            this.outputStream = socket.getOutputStream();
+            this.inputStream = socket.getInputStream();
+            this.bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public boolean login(String login) throws IOException {
         String cmd = "login " + login + " " + "\n";
+        this.username = login;
         outputStream.write(cmd.getBytes());
         String response = bufferedReader.readLine();
         if ("online".equalsIgnoreCase(response)) {
@@ -46,19 +62,10 @@ public class Client {
             return false;
     }
 
-    public void startMessageReader() {
-        Thread t = new Thread(this::readMessageLoop);
-        Thread w = new Thread(this::startMsgWriter);
-        Thread h = new Thread(this::startHeartBeat);
-        t.start();
-        w.start();
-        h.start();
-    }
-
-    public void startHeartBeat() {
+    private void startHeartBeat() {
         try {
             while (true) {
-                msgPipe.offer("isalive" + "\n");
+                msgPipe.offer("isalive" + " " + username + "\n");
                 System.out.println("Sending heartbeat to server");
                 Thread.sleep(TimeUnit.SECONDS.toMillis(5));
             }
@@ -67,7 +74,7 @@ public class Client {
         }
     }
 
-    public void readMessageLoop() {
+    private void readMessageLoop() {
         assignCmds();
         try {
             String line;
@@ -89,45 +96,22 @@ public class Client {
         }
     }
 
-    public boolean connect() {
-        try {
-            this.socket = new Socket(serverName, port);
-            this.outputStream = socket.getOutputStream();
-            this.inputStream = socket.getInputStream();
-            this.bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
     public void requestSymbol(int x, int y) {
         String symbolCmd;
         if (symbol.toString().equalsIgnoreCase("x"))
             symbolCmd = "addcross";
         else
             symbolCmd = "addnaught";
-        String cmd = symbolCmd + " " + x + " " + y + "\n";
-        System.out.println(cmd);
-        msgPipe.offer(cmd);
+        msgPipe.offer(symbolCmd + " " + x + " " + y + "\n");
     }
 
-    public void addMessageListener(MessageListener messageListener) {
-        messageListeners.add(messageListener);
-    }
-
-    public Symbol getSymbol() {
-        return symbol;
-    }
-
-    public void startMsgWriter() {
+    private void startMsgWriter() {
         while (true) {
             try {
                 String msg = msgPipe.take();
                 outputStream.write(msg.getBytes());
             } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
+                System.out.println("System error at message writer");
             }
         }
     }
@@ -136,5 +120,43 @@ public class Client {
         clientCommands.put("addcross", new AddSymbol(messageListeners));
         clientCommands.put("addnaught", new AddSymbol(messageListeners));
         clientCommands.put("win", new Win(messageListeners));
+        clientCommands.put("isalive", new Heartbeat(heartbeatPipe));
+    }
+
+    private void startMessageReader() {
+        Thread t = new Thread(this::readMessageLoop);
+        Thread w = new Thread(this::startMsgWriter);
+        Thread h = new Thread(this::startHeartBeat);
+        Thread s = new Thread(this::startDeliveringHeartbeats);
+        t.start();
+        w.start();
+        h.start();
+        s.start();
+    }
+
+    private void startDeliveringHeartbeats() {
+        try {
+            while (true) {
+                String[] tokens = heartbeatPipe.take().split(" ");
+                for (MessageListener messageListener : messageListeners) {
+                    if (heartbeatPipe.isEmpty())
+                        tokens[0] = "disconnect";
+                    else
+                        tokens[0] = "isalive";
+                    messageListener.onMessage(null, tokens);
+                }
+                Thread.sleep(TimeUnit.SECONDS.toMillis(7));
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addMessageListener(MessageListener messageListener) {
+        messageListeners.add(messageListener);
+    }
+
+    public Symbol getSymbol() {
+        return symbol;
     }
 }
