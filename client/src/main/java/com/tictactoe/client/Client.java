@@ -1,8 +1,8 @@
 package com.tictactoe.client;
 
 import com.tictactoe.client.command.AddSymbol;
-import com.tictactoe.client.command.AssignSymbol;
 import com.tictactoe.client.command.Command;
+import com.tictactoe.client.command.Win;
 import com.tictactoe.symbol.Symbol;
 
 import java.io.*;
@@ -67,40 +67,25 @@ public class Client {
         }
     }
 
-
     public void readMessageLoop() {
+        assignCmds();
         try {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 String[] tokens = line.split(" ");
                 String cmd = tokens[0];
-                String finalLine = line;
                 invokeLater(() -> {
                     if ("cross".equalsIgnoreCase(cmd) || "naught".equalsIgnoreCase(cmd)) {
-                        //this.symbol = SymbolAssigner.assign(cmd);
-                    } else if ("addcross".equalsIgnoreCase(cmd) || "addnaught".equalsIgnoreCase(cmd)) {
-                        String[] tokenUpdate = finalLine.split(" ", 3);
-                        handleUpdate(tokenUpdate);
-                    } else if ("win".equalsIgnoreCase(cmd)) {
-                        String[] tokenWin = finalLine.split(" ", 2);
-                        handleWin(tokenWin);
+                        this.symbol = SymbolAssigner.assign(cmd);
+                    }
+                    if (clientCommands.containsKey(cmd)) {
+                        Command c = clientCommands.get(cmd);
+                        c.execute(tokens);
                     }
                 });
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    private void handleUpdate(String[] tokenUpdate) {
-        for (MessageListener listener : messageListeners) {
-            listener.onMessage(null, tokenUpdate);
-        }
-    }
-
-    private void handleWin(String[] tokenWin) {
-        for (MessageListener listener : messageListeners) {
-            listener.onMessage(null, tokenWin);
         }
     }
 
@@ -148,9 +133,8 @@ public class Client {
     }
 
     private void assignCmds() {
-        clientCommands.put("cross", new AssignSymbol(this.symbol));
-        clientCommands.put("naught", new AssignSymbol(this.symbol));
         clientCommands.put("addcross", new AddSymbol(messageListeners));
         clientCommands.put("addnaught", new AddSymbol(messageListeners));
+        clientCommands.put("win", new Win(messageListeners));
     }
 }
