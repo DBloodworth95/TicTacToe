@@ -1,5 +1,8 @@
 package com.tictactoe.client;
 
+import com.tictactoe.client.command.AddSymbol;
+import com.tictactoe.client.command.AssignSymbol;
+import com.tictactoe.client.command.Command;
 import com.tictactoe.symbol.Symbol;
 
 import java.io.*;
@@ -22,6 +25,7 @@ public class Client {
     private List<LobbyStatusListener> lobbyStatusListeners = new ArrayList<>();
     private List<MessageListener> messageListeners = new ArrayList<>();
     private final BlockingQueue<String> msgPipe = new ArrayBlockingQueue<>(100);
+    private Map<String, Command> clientCommands = new HashMap<>();
 
 
     public Client(String serverName, int port, String username, Symbol symbol) {
@@ -73,11 +77,9 @@ public class Client {
                 String finalLine = line;
                 invokeLater(() -> {
                     if ("cross".equalsIgnoreCase(cmd) || "naught".equalsIgnoreCase(cmd)) {
-                        this.symbol = SymbolAssigner.assign(cmd);
-                        System.out.println(this.symbol.toString());
+                        //this.symbol = SymbolAssigner.assign(cmd);
                     } else if ("addcross".equalsIgnoreCase(cmd) || "addnaught".equalsIgnoreCase(cmd)) {
                         String[] tokenUpdate = finalLine.split(" ", 3);
-                        System.out.println("Command read");
                         handleUpdate(tokenUpdate);
                     } else if ("win".equalsIgnoreCase(cmd)) {
                         String[] tokenWin = finalLine.split(" ", 2);
@@ -143,5 +145,12 @@ public class Client {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void assignCmds() {
+        clientCommands.put("cross", new AssignSymbol(this.symbol));
+        clientCommands.put("naught", new AssignSymbol(this.symbol));
+        clientCommands.put("addcross", new AddSymbol(messageListeners));
+        clientCommands.put("addnaught", new AddSymbol(messageListeners));
     }
 }

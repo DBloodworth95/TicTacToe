@@ -1,9 +1,9 @@
 package server;
 
-import server.commands.AddCrossCommand;
-import server.commands.AddNaughtCommand;
-import server.commands.Command;
-import server.commands.LoginCommand;
+import server.command.AddCrossCommand;
+import server.command.AddNaughtCommand;
+import server.command.Command;
+import server.command.LoginCommand;
 
 import java.io.*;
 import java.net.Socket;

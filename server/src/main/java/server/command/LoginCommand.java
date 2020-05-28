@@ -1,4 +1,4 @@
-package server.commands;
+package server.command;
 
 import server.Board;
 import server.ClientHandler;
