@@ -32,23 +32,21 @@ public class AddCrossCommand implements Command {
     public void execute(String[] tokens) {
         List<ClientHandler> handlerList = server.getHandlers();
         if (tokens.length == 3 && board.getIsTurn() % 2 == 0) {
-            String tileX = tokens[1];
-            String tileY = tokens[2];
+            int tileX = Integer.parseInt(tokens[1]);
+            int tileY = Integer.parseInt(tokens[2]);
+
             String name = board.getPlayersTurn(board.getIsTurn());
-            String msg = "addcross" + " " + tileX + " " + tileY + " " + name + "\n";
-            String invalidTileMsg = "Invalid tile" + "\n";
-            String winMsg = "win" + " " + Symbol.X.toString() + "\n";
-            if (board.isValidTile(Integer.parseInt(tileX), Integer.parseInt(tileY))) {
-                board.addSymbol(Symbol.X, Integer.parseInt(tileX), Integer.parseInt(tileY));
+            if (board.isValidTile(tileX, tileY)) {
+                board.addSymbol(Symbol.X, tileX, tileY);
                 System.out.println("cross" + " " + tileX + " " + tileY);
                 for (ClientHandler handler : handlerList) {
-                    handler.send(msg);
+                    handler.send("addcross" + " " + tileX + " " + tileY + " " + name + "\n");
                     if (board.isWin())
-                        handler.send(winMsg);
+                        handler.send("win" + " " + Symbol.X.toString() + "\n");
                 }
             } else {
                 for (ClientHandler handler : handlerList) {
-                    handler.send(invalidTileMsg);
+                    handler.send("Invalid tile" + "\n");
                 }
             }
         }

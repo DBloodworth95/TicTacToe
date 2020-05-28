@@ -30,26 +30,23 @@ public class AddNaughtCommand implements Command {
     public void execute(String[] tokens) {
         List<ClientHandler> handlerList = server.getHandlers();
         if (tokens.length == 3 && board.getIsTurn() % 2 != 0) {
-            String tileX = tokens[1];
-            String tileY = tokens[2];
+            int tileX = Integer.parseInt(tokens[1]);
+            int tileY = Integer.parseInt(tokens[2]);
+
             String name = board.getPlayersTurn(board.getIsTurn());
-            String msg = "addnaught" + " " + tileX + " " + tileY + " " + name + "\n";
-            System.out.println(msg);
-            String invalidTileMsg = "Invalid tile" + "\n";
-            String winMsg = "win" + " " + Symbol.O.toString() + "\n";
-            if (board.isValidTile(Integer.parseInt(tileX), Integer.parseInt(tileY))) {
-                board.addSymbol(Symbol.O, Integer.parseInt(tileX), Integer.parseInt(tileY));
+            if (board.isValidTile(tileX, tileY)) {
+                board.addSymbol(Symbol.O, tileX, tileY);
                 System.out.println("naught recieved");
                 for (ClientHandler handler : handlerList) {
-                    handler.send(msg);
+                    handler.send("addnaught" + " " + tileX + " " + tileY + " " + name + "\n");
                     if (board.isWin()) {
                         System.out.println("Win");
-                        handler.send(winMsg);
+                        handler.send("win" + " " + Symbol.O.toString() + "\n");
                     }
                 }
             } else {
                 for (ClientHandler handler : handlerList) {
-                    handler.send(invalidTileMsg);
+                    handler.send("Invalid tile" + "\n");
                 }
             }
         }
