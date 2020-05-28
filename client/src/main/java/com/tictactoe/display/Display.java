@@ -28,22 +28,24 @@ public class Display extends JFrame implements ActionListener {
         this.username = username;
         client.addMessageListener((login, msg) -> {
             Symbol symbol;
-            String x = "null";
-            String y = "null";
-            if (msg.length == 3) {
+            String x = "x";
+            String y = "y";
+            String turn = "null";
+            if (msg.length == 4) {
                 x = msg[1];
                 y = msg[2];
+                turn = msg[3];
             }
             if (msg[0].equalsIgnoreCase("addnaught")) {
                 symbol = Symbol.O;
                 tiles[Integer.parseInt(x)][Integer.parseInt(y)].setForeground(Color.GREEN);
                 tiles[Integer.parseInt(x)][Integer.parseInt(y)].setText(String.valueOf(symbol));
-                statusLabel.setText("Current turn: Cross");
+                statusLabel.setText("Current turn: " + turn);
             } else if (msg[0].equalsIgnoreCase("addcross")) {
                 symbol = Symbol.X;
                 tiles[Integer.parseInt(x)][Integer.parseInt(y)].setForeground(Color.RED);
                 tiles[Integer.parseInt(x)][Integer.parseInt(y)].setText(String.valueOf(symbol));
-                statusLabel.setText("Current turn: Naught");
+                statusLabel.setText("Current turn: " + turn);
             } else if (msg[0].equalsIgnoreCase("win")) {
                 String winner = msg[1];
                 if (client.getSymbol().toString().equalsIgnoreCase(winner)) {

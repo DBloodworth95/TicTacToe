@@ -45,9 +45,11 @@ public class LoginCommand implements Command {
             String crossMsg = "cross" + "\n";
             if (server.getHandlers().size() == 1) {
                 outputStream.write(naughtMsg.getBytes());
+                board.setP1(login.toString());
                 System.out.println("naught sent");
             } else {
                 outputStream.write(crossMsg.getBytes());
+                board.setP2(login.toString());
                 System.out.println("cross sent");
             }
         }

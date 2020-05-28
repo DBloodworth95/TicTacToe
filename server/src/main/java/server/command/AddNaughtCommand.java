@@ -32,7 +32,9 @@ public class AddNaughtCommand implements Command {
         if (tokens.length == 3 && board.getIsTurn() % 2 != 0) {
             String tileX = tokens[1];
             String tileY = tokens[2];
-            String msg = "addnaught" + " " + tileX + " " + tileY + "\n";
+            String name = board.getPlayersTurn(board.getIsTurn());
+            String msg = "addnaught" + " " + tileX + " " + tileY + " " + name + "\n";
+            System.out.println(msg);
             String invalidTileMsg = "Invalid tile" + "\n";
             String winMsg = "win" + " " + Symbol.O.toString() + "\n";
             if (board.isValidTile(Integer.parseInt(tileX), Integer.parseInt(tileY))) {
