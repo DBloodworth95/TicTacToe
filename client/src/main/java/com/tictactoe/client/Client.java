@@ -111,7 +111,9 @@ public class Client {
                 String msg = msgPipe.take();
                 outputStream.write(msg.getBytes());
             } catch (IOException | InterruptedException e) {
-                System.out.println("System error at message writer");
+                for (MessageListener messageListener : messageListeners) {
+                    messageListener.onMessage(null, "disconnect".split(" "));
+                }
             }
         }
     }
@@ -139,13 +141,9 @@ public class Client {
             while (true) {
                 String[] tokens = heartbeatPipe.take().split(" ");
                 for (MessageListener messageListener : messageListeners) {
-                    if (heartbeatPipe.isEmpty())
-                        tokens[0] = "disconnect";
-                    else
-                        tokens[0] = "isalive";
                     messageListener.onMessage(null, tokens);
                 }
-                Thread.sleep(TimeUnit.SECONDS.toMillis(7));
+                Thread.sleep(TimeUnit.SECONDS.toMillis(5));
             }
         } catch (InterruptedException e) {
             e.printStackTrace();

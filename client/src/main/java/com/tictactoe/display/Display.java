@@ -58,7 +58,7 @@ public class Display extends JFrame implements ActionListener {
             } else if (msg[0].equalsIgnoreCase("isalive")) {
                 System.out.println("I'm still connected");
             } else if (msg[0].equalsIgnoreCase("disconnect")) {
-                System.out.println("I disconnected");
+                disconnected();
             }
         });
     }
@@ -99,5 +99,13 @@ public class Display extends JFrame implements ActionListener {
         Integer x = (Integer) clickedButton.getClientProperty("x");
         Integer y = (Integer) clickedButton.getClientProperty("y");
         client.requestSymbol(x, y);
+    }
+
+    private void disconnected() {
+        for (int i = 0; i < BOARD_LENGTH; i++)
+            for (int j = 0; j < BOARD_WIDTH; j++) {
+                tiles[i][j].setEnabled(false);
+            }
+        statusLabel.setText("Connection Lost - Attempting to re-connect.");
     }
 }
