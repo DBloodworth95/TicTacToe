@@ -45,7 +45,6 @@ public class ClientHandler extends Thread {
                 String[] tokens = line.split(" ");
                 if (tokens.length > 0) {
                     String cmd = tokens[0];
-                    System.out.println(serverCommands.containsKey(cmd));
                     if (serverCommands.containsKey(cmd)) {
                         Command c = serverCommands.get(cmd);
                         try {

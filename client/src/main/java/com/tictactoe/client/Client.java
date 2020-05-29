@@ -54,16 +54,14 @@ public class Client {
         return false;
     }
 
-    public boolean login(String login) throws IOException {
+    public void login(String login) throws IOException {
         String cmd = "login " + login + " " + "\n";
         this.username = login;
         outputStream.write(cmd.getBytes());
         String response = bufferedReader.readLine();
         if ("online".equalsIgnoreCase(response)) {
             startCommunications();
-            return true;
-        } else
-            return false;
+        }
     }
 
     private void startHeartBeat() {
@@ -115,16 +113,9 @@ public class Client {
                 String msg = msgPipe.take();
                 outputStream.write(msg.getBytes());
             } catch (IOException | InterruptedException e) {
+
                 for (MessageListener messageListener : messageListeners) {
                     messageListener.onMessage(null, "disconnect".split(" "));
-                    try {
-                        t.join();
-                        w.join();
-                        h.join();
-                        s.join();
-                    } catch (InterruptedException interruptedException) {
-                        interruptedException.printStackTrace();
-                    }
                 }
             }
         }

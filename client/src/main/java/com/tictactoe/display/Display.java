@@ -22,30 +22,31 @@ public class Display extends JFrame implements ActionListener {
     JButton[][] tiles = new JButton[BOARD_LENGTH][BOARD_WIDTH];
     JPanel statusPanel = new JPanel();
     JPanel gamePanel = new JPanel();
-    JLabel statusLabel = new JLabel("Current turn: ");
+    JLabel turnLabel = new JLabel("Current turn: ");
+    JLabel statusLabel = new JLabel("Connected!");
 
     public Display(String username) {
         this.username = username;
         client.addMessageListener((login, msg) -> {
             Symbol symbol;
-            String x = "x";
-            String y = "y";
+            int x = 0;
+            int y = 0;
             String turn = "null";
             if (msg.length == 4) {
-                x = msg[1];
-                y = msg[2];
+                x = Integer.parseInt(msg[1]);
+                y = Integer.parseInt(msg[2]);
                 turn = msg[3];
             }
             if (msg[0].equalsIgnoreCase("addnaught")) {
                 symbol = Symbol.O;
-                tiles[Integer.parseInt(x)][Integer.parseInt(y)].setForeground(Color.GREEN);
-                tiles[Integer.parseInt(x)][Integer.parseInt(y)].setText(String.valueOf(symbol));
-                statusLabel.setText("Current turn: " + turn);
+                tiles[x][y].setForeground(Color.GREEN);
+                tiles[x][y].setText(String.valueOf(symbol));
+                turnLabel.setText("Current turn: " + turn);
             } else if (msg[0].equalsIgnoreCase("addcross")) {
                 symbol = Symbol.X;
-                tiles[Integer.parseInt(x)][Integer.parseInt(y)].setForeground(Color.RED);
-                tiles[Integer.parseInt(x)][Integer.parseInt(y)].setText(String.valueOf(symbol));
-                statusLabel.setText("Current turn: " + turn);
+                tiles[x][y].setForeground(Color.RED);
+                tiles[x][y].setText(String.valueOf(symbol));
+                turnLabel.setText("Current turn: " + turn);
             } else if (msg[0].equalsIgnoreCase("win")) {
                 String winner = msg[1];
                 if (client.getSymbol().toString().equalsIgnoreCase(winner)) {
@@ -56,7 +57,7 @@ public class Display extends JFrame implements ActionListener {
                 finalDialogue.setLocationRelativeTo(getRootPane());
                 finalDialogue.setVisible(true);
             } else if (msg[0].equalsIgnoreCase("isalive")) {
-                System.out.println("I'm still connected");
+                reconnect();
             } else if (msg[0].equalsIgnoreCase("disconnect")) {
                 disconnected();
             }
@@ -79,6 +80,7 @@ public class Display extends JFrame implements ActionListener {
 
     private void construct() {
         gamePanel.setLayout(new GridLayout(BOARD_LENGTH, BOARD_WIDTH));
+        statusPanel.add(turnLabel);
         statusPanel.add(statusLabel);
         for (int i = 0; i < BOARD_LENGTH; i++)
             for (int j = 0; j < BOARD_WIDTH; j++) {
@@ -103,9 +105,15 @@ public class Display extends JFrame implements ActionListener {
 
     private void disconnected() {
         for (int i = 0; i < BOARD_LENGTH; i++)
-            for (int j = 0; j < BOARD_WIDTH; j++) {
+            for (int j = 0; j < BOARD_WIDTH; j++)
                 tiles[i][j].setEnabled(false);
-            }
         statusLabel.setText("Connection Lost - Attempting to re-connect.");
+    }
+
+    private void reconnect() {
+        for (int i = 0; i < BOARD_LENGTH; i++)
+            for (int j = 0; j < BOARD_WIDTH; j++)
+                tiles[i][j].setEnabled(true);
+        statusLabel.setText("Connected!");
     }
 }
