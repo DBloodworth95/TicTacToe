@@ -28,6 +28,10 @@ public class Client {
     private final BlockingQueue<String> msgPipe = new ArrayBlockingQueue<>(10);
     private final BlockingQueue<String> heartbeatPipe = new ArrayBlockingQueue<>(1);
     private Map<String, Command> clientCommands = new HashMap<>();
+    private Thread t = new Thread(this::readMessageLoop);
+    private Thread w = new Thread(this::startMsgWriter);
+    private Thread h = new Thread(this::startHeartBeat);
+    private Thread s = new Thread(this::startDeliveringHeartbeats);
 
 
     public Client(String serverName, int port, String username, Symbol symbol) {
@@ -56,7 +60,7 @@ public class Client {
         outputStream.write(cmd.getBytes());
         String response = bufferedReader.readLine();
         if ("online".equalsIgnoreCase(response)) {
-            startMessageReader();
+            startCommunications();
             return true;
         } else
             return false;
@@ -113,6 +117,14 @@ public class Client {
             } catch (IOException | InterruptedException e) {
                 for (MessageListener messageListener : messageListeners) {
                     messageListener.onMessage(null, "disconnect".split(" "));
+                    try {
+                        t.join();
+                        w.join();
+                        h.join();
+                        s.join();
+                    } catch (InterruptedException interruptedException) {
+                        interruptedException.printStackTrace();
+                    }
                 }
             }
         }
@@ -125,11 +137,7 @@ public class Client {
         clientCommands.put("isalive", new Heartbeat(heartbeatPipe));
     }
 
-    private void startMessageReader() {
-        Thread t = new Thread(this::readMessageLoop);
-        Thread w = new Thread(this::startMsgWriter);
-        Thread h = new Thread(this::startHeartBeat);
-        Thread s = new Thread(this::startDeliveringHeartbeats);
+    private void startCommunications() {
         t.start();
         w.start();
         h.start();
