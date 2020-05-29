@@ -61,6 +61,7 @@ public class Client {
         outputStream.write(cmd.getBytes());
         String response = bufferedReader.readLine();
         if ("online".equalsIgnoreCase(response)) {
+            running = true;
             startCommunications();
         }
     }
