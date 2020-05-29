@@ -32,6 +32,7 @@ public class Client {
     private Thread w = new Thread(this::startMsgWriter);
     private Thread h = new Thread(this::startHeartBeat);
     private Thread s = new Thread(this::startDeliveringHeartbeats);
+    private boolean running = true;
 
 
     public Client(String serverName, int port, String username, Symbol symbol) {
@@ -66,7 +67,7 @@ public class Client {
 
     private void startHeartBeat() {
         try {
-            while (true) {
+            while (running) {
                 msgPipe.offer("isalive" + " " + username + "\n");
                 System.out.println("Sending heartbeat to server");
                 Thread.sleep(TimeUnit.SECONDS.toMillis(5));
@@ -108,14 +109,22 @@ public class Client {
     }
 
     private void startMsgWriter() {
-        while (true) {
+        while (running) {
             try {
                 String msg = msgPipe.take();
                 outputStream.write(msg.getBytes());
             } catch (IOException | InterruptedException e) {
-
-                for (MessageListener messageListener : messageListeners) {
-                    messageListener.onMessage(null, "disconnect".split(" "));
+                try {
+                    for (MessageListener messageListener : messageListeners) {
+                        messageListener.onMessage(null, "disconnect".split(" "));
+                        running = false;
+                        t.join();
+                        w.join();
+                        h.join();
+                        s.join();
+                    }
+                } catch (InterruptedException interruptedException) {
+                    interruptedException.printStackTrace();
                 }
             }
         }
@@ -137,7 +146,7 @@ public class Client {
 
     private void startDeliveringHeartbeats() {
         try {
-            while (true) {
+            while (running) {
                 String[] tokens = heartbeatPipe.take().split(" ");
                 for (MessageListener messageListener : messageListeners) {
                     messageListener.onMessage(null, tokens);
