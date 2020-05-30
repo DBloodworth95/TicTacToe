@@ -31,7 +31,7 @@ public class Client {
     private final BlockingQueue<String> msgPipe = new ArrayBlockingQueue<>(10);
     private final BlockingQueue<String> heartbeatPipe = new ArrayBlockingQueue<>(1);
     private Map<String, Command> clientCommands = new HashMap<>();
-    private Thread t = new Thread(this::readMessageLoop);
+    private Thread messageLoopThread;
     private Thread heartBeatSenderThread;
     private Thread serverWriterThread;
     private Thread heartbeatWriterThread;
@@ -114,10 +114,12 @@ public class Client {
         serverWriter = new ServerWriter(this, msgPipe, outputStream, messageListeners);
         heartbeatSender = new HeartbeatSender(heartbeatPipe, messageListeners);
 
+        messageLoopThread = new Thread(this::readMessageLoop);
         heartbeatWriterThread = new Thread(heartbeatWriter);
         serverWriterThread = new Thread(serverWriter);
         heartBeatSenderThread = new Thread(heartbeatSender);
-        t.start();
+
+        messageLoopThread.start();
         serverWriterThread.start();
         heartbeatWriterThread.start();
         heartBeatSenderThread.start();
