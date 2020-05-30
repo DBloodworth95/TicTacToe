@@ -1,9 +1,6 @@
 package com.tictactoe.client;
 
-import com.tictactoe.client.command.AddSymbol;
-import com.tictactoe.client.command.Command;
-import com.tictactoe.client.command.Heartbeat;
-import com.tictactoe.client.command.Win;
+import com.tictactoe.client.command.*;
 import com.tictactoe.client.worker.HeartbeatSender;
 import com.tictactoe.client.worker.HeartbeatWriter;
 import com.tictactoe.client.worker.ServerWriter;
@@ -101,12 +98,13 @@ public class Client {
         msgPipe.offer(symbolCmd + " " + x + " " + y + "\n");
     }
 
-
     private void assignCmds() {
         clientCommands.put("addcross", new AddSymbol(messageListeners));
         clientCommands.put("addnaught", new AddSymbol(messageListeners));
         clientCommands.put("win", new Win(messageListeners));
         clientCommands.put("isalive", new Heartbeat(heartbeatPipe));
+        clientCommands.put("waiting", new LobbyStatus(messageListeners));
+        clientCommands.put("ready", new LobbyStatus(messageListeners));
     }
 
     private void startWorkerThreads() {

@@ -40,9 +40,13 @@ public class LoginCommand implements Command {
             }
             if (server.getHandlers().size() == 1) {
                 outputStream.write("naught\n".getBytes());
+                for (ClientHandler handler : handlerList)
+                    handler.send("waiting\n");
                 board.setP1(login.toString());
             } else {
                 outputStream.write("cross\n".getBytes());
+                for (ClientHandler handler : handlerList)
+                    handler.send("ready\n");
                 board.setP2(login.toString());
             }
         }

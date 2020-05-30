@@ -19,11 +19,11 @@ public class Display extends JFrame implements ActionListener {
     static final int BOARD_WIDTH = 3;
     static final int PORT = 8818;
     final Client client = new Client("localhost", PORT, "guest", null);
+    private boolean disconnected = false;
     JButton[][] tiles = new JButton[BOARD_LENGTH][BOARD_WIDTH];
     JPanel statusPanel = new JPanel();
     JPanel gamePanel = new JPanel();
     JLabel turnLabel = new JLabel("Current turn: ");
-    JLabel statusLabel = new JLabel("Connected!");
 
     public Display(String username) {
         this.username = username;
@@ -56,10 +56,20 @@ public class Display extends JFrame implements ActionListener {
                 }
                 finalDialogue.setLocationRelativeTo(getRootPane());
                 finalDialogue.setVisible(true);
-            } else if (msg[0].equalsIgnoreCase("isalive")) {
-                reconnect();
+            } else if (msg[0].equalsIgnoreCase("isalive") && disconnected) {
+                this.setTitle("Connected!");
+                setTilesEnabled(true);
+                disconnected = false;
             } else if (msg[0].equalsIgnoreCase("disconnect")) {
-                disconnected();
+                disconnected = true;
+                this.setTitle("Connection Lost - Attempting to re-connect.");
+                setTilesEnabled(false);
+            } else if (msg[0].equalsIgnoreCase("waiting")) {
+                this.setTitle("Waiting for another player..");
+                setTilesEnabled(false);
+            } else if (msg[0].equalsIgnoreCase("ready")) {
+                this.setTitle("Begin!");
+                setTilesEnabled(true);
             }
         });
     }
@@ -81,7 +91,6 @@ public class Display extends JFrame implements ActionListener {
     private void construct() {
         gamePanel.setLayout(new GridLayout(BOARD_LENGTH, BOARD_WIDTH));
         statusPanel.add(turnLabel);
-        statusPanel.add(statusLabel);
         for (int i = 0; i < BOARD_LENGTH; i++)
             for (int j = 0; j < BOARD_WIDTH; j++) {
                 tiles[i][j] = new JButton();
@@ -103,17 +112,9 @@ public class Display extends JFrame implements ActionListener {
         client.requestSymbol(x, y);
     }
 
-    private void disconnected() {
+    private void setTilesEnabled(boolean isEnabled) {
         for (int i = 0; i < BOARD_LENGTH; i++)
             for (int j = 0; j < BOARD_WIDTH; j++)
-                tiles[i][j].setEnabled(false);
-        statusLabel.setText("Connection Lost - Attempting to re-connect.");
-    }
-
-    private void reconnect() {
-        for (int i = 0; i < BOARD_LENGTH; i++)
-            for (int j = 0; j < BOARD_WIDTH; j++)
-                tiles[i][j].setEnabled(true);
-        statusLabel.setText("Connected!");
+                tiles[i][j].setEnabled(isEnabled);
     }
 }
