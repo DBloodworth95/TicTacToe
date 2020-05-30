@@ -4,6 +4,7 @@ import com.tictactoe.client.command.AddSymbol;
 import com.tictactoe.client.command.Command;
 import com.tictactoe.client.command.Heartbeat;
 import com.tictactoe.client.command.Win;
+import com.tictactoe.client.worker.HeartbeatSender;
 import com.tictactoe.symbol.Symbol;
 
 import java.io.*;
@@ -30,9 +31,9 @@ public class Client {
     private Map<String, Command> clientCommands = new HashMap<>();
     private Thread t = new Thread(this::readMessageLoop);
     private Thread w = new Thread(this::startMsgWriter);
-    private Thread h = new Thread(this::startHeartBeat);
     private Thread s = new Thread(this::startDeliveringHeartbeats);
-    private boolean running = true;
+    private Thread heartbeatSenderThread;
+    private HeartbeatSender heartbeatSender;
 
 
     public Client(String serverName, int port, String username, Symbol symbol) {
@@ -61,20 +62,7 @@ public class Client {
         outputStream.write(cmd.getBytes());
         String response = bufferedReader.readLine();
         if ("online".equalsIgnoreCase(response)) {
-            running = true;
-            startCommunications();
-        }
-    }
-
-    private void startHeartBeat() {
-        try {
-            while (running) {
-                msgPipe.offer("isalive" + " " + username + "\n");
-                System.out.println("Sending heartbeat to server");
-                Thread.sleep(TimeUnit.SECONDS.toMillis(5));
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            startWorkerThreads();
         }
     }
 
@@ -110,22 +98,14 @@ public class Client {
     }
 
     private void startMsgWriter() {
-        while (running) {
+        while (true) {
             try {
                 String msg = msgPipe.take();
                 outputStream.write(msg.getBytes());
             } catch (IOException | InterruptedException e) {
-                try {
-                    for (MessageListener messageListener : messageListeners) {
-                        messageListener.onMessage(null, "disconnect".split(" "));
-                        running = false;
-                        t.join();
-                        w.join();
-                        h.join();
-                        s.join();
-                    }
-                } catch (InterruptedException interruptedException) {
-                    interruptedException.printStackTrace();
+                for (MessageListener messageListener : messageListeners) {
+                    messageListener.onMessage(null, "disconnect".split(" "));
+                    stopWorkerThreads();
                 }
             }
         }
@@ -138,16 +118,27 @@ public class Client {
         clientCommands.put("isalive", new Heartbeat(heartbeatPipe));
     }
 
-    private void startCommunications() {
+    private void startWorkerThreads() {
+        heartbeatSender = new HeartbeatSender(msgPipe, username);
+        heartbeatSenderThread = new Thread(heartbeatSender);
         t.start();
         w.start();
-        h.start();
+        heartbeatSenderThread.start();
         s.start();
+    }
+
+    private void stopWorkerThreads() {
+        try {
+            heartbeatSender.stop();
+            heartbeatSenderThread.join();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void startDeliveringHeartbeats() {
         try {
-            while (running) {
+            while (true) {
                 String[] tokens = heartbeatPipe.take().split(" ");
                 for (MessageListener messageListener : messageListeners) {
                     messageListener.onMessage(null, tokens);
