@@ -5,6 +5,7 @@ import com.tictactoe.client.command.Command;
 import com.tictactoe.client.command.Heartbeat;
 import com.tictactoe.client.command.Win;
 import com.tictactoe.client.worker.HeartbeatSender;
+import com.tictactoe.client.worker.ServerWriter;
 import com.tictactoe.symbol.Symbol;
 
 import java.io.*;
@@ -30,10 +31,11 @@ public class Client {
     private final BlockingQueue<String> heartbeatPipe = new ArrayBlockingQueue<>(1);
     private Map<String, Command> clientCommands = new HashMap<>();
     private Thread t = new Thread(this::readMessageLoop);
-    private Thread w = new Thread(this::startMsgWriter);
     private Thread s = new Thread(this::startDeliveringHeartbeats);
     private Thread heartbeatSenderThread;
+    private Thread serverWriterThread;
     private HeartbeatSender heartbeatSender;
+    private ServerWriter serverWriter;
 
 
     public Client(String serverName, int port, String username, Symbol symbol) {
@@ -97,19 +99,6 @@ public class Client {
         msgPipe.offer(symbolCmd + " " + x + " " + y + "\n");
     }
 
-    private void startMsgWriter() {
-        while (true) {
-            try {
-                String msg = msgPipe.take();
-                outputStream.write(msg.getBytes());
-            } catch (IOException | InterruptedException e) {
-                for (MessageListener messageListener : messageListeners) {
-                    messageListener.onMessage(null, "disconnect".split(" "));
-                    stopWorkerThreads();
-                }
-            }
-        }
-    }
 
     private void assignCmds() {
         clientCommands.put("addcross", new AddSymbol(messageListeners));
@@ -120,17 +109,21 @@ public class Client {
 
     private void startWorkerThreads() {
         heartbeatSender = new HeartbeatSender(msgPipe, username);
+        serverWriter = new ServerWriter(this, msgPipe, outputStream, messageListeners);
         heartbeatSenderThread = new Thread(heartbeatSender);
+        serverWriterThread = new Thread(serverWriter);
         t.start();
-        w.start();
+        serverWriterThread.start();
         heartbeatSenderThread.start();
         s.start();
     }
 
-    private void stopWorkerThreads() {
+    public void stopWorkerThreads() {
         try {
             heartbeatSender.stop();
+            serverWriter.stop();
             heartbeatSenderThread.join();
+            serverWriterThread.join();
         } catch (Exception e) {
             e.printStackTrace();
         }

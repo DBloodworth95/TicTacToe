@@ -34,7 +34,7 @@ public class HeartbeatSender implements Runnable {
         }
     }
 
-    public void stop() throws Exception {
+    public void stop() {
         synchronized (this) {
             running = false;
         }
