@@ -1,5 +1,6 @@
 package server.command;
 
+import com.tictactoe.symbol.Symbol;
 import server.Board;
 import server.ClientHandler;
 import server.Server;
@@ -14,15 +15,18 @@ public class LoginCommand implements Command {
 
     private final AtomicReference<String> login;
 
+    private final AtomicReference<Symbol> symbol;
+
     private final Server server;
 
     private final Board board;
 
-    public LoginCommand(OutputStream outputStream, AtomicReference<String> login, Server server, Board board) {
+    public LoginCommand(OutputStream outputStream, AtomicReference<String> login, Server server, Board board, AtomicReference<Symbol> symbol) {
         this.outputStream = outputStream;
         this.login = login;
         this.server = server;
         this.board = board;
+        this.symbol = symbol;
     }
 
     @Override
@@ -56,4 +60,5 @@ public class LoginCommand implements Command {
     public void execute() {
 
     }
+
 }

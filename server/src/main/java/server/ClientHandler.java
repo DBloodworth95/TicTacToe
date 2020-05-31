@@ -1,5 +1,6 @@
 package server;
 
+import com.tictactoe.symbol.Symbol;
 import server.command.*;
 
 import java.io.*;
@@ -18,6 +19,7 @@ public class ClientHandler extends Thread {
     private OutputStream sendStream;
     Map<String, Command> serverCommands = new HashMap<>();
     private final BlockingQueue<String> msgPipe = new ArrayBlockingQueue<>(100);
+    private AtomicReference<Symbol> symbol;
 
 
     public ClientHandler(Server server, Socket clientSocket, Board board) {
@@ -67,6 +69,13 @@ public class ClientHandler extends Thread {
         return login.toString();
     }
 
+    public Symbol getSymbol() {
+        if (symbol.toString().equalsIgnoreCase("x"))
+            return Symbol.X;
+        else
+            return Symbol.O;
+    }
+
     public void send(String msg) {
         if (login != null) {
             msgPipe.offer(msg);
@@ -85,7 +94,7 @@ public class ClientHandler extends Thread {
     }
 
     private void assignCmds() {
-        serverCommands.put("login", new LoginCommand(sendStream, login, server, board));
+        serverCommands.put("login", new LoginCommand(sendStream, login, server, board, this.symbol));
         serverCommands.put("addnaught", new AddNaughtCommand(sendStream, login, server, board));
         serverCommands.put("addcross", new AddCrossCommand(sendStream, login, server, board));
         serverCommands.put("isalive", new Heartbeat(sendStream, login, server));
