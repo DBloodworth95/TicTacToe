@@ -5,8 +5,6 @@ import server.command.*;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicReference;
@@ -17,10 +15,8 @@ public class ClientHandler extends Thread {
     private Board board;
     public AtomicReference<String> login = new AtomicReference<>();
     private OutputStream sendStream;
-    Map<String, Command> serverCommands = new HashMap<>();
     private final BlockingQueue<String> msgPipe = new ArrayBlockingQueue<>(100);
-    private AtomicReference<Symbol> symbol;
-
+    private AtomicReference<Symbol> symbol = new AtomicReference<>();
 
     public ClientHandler(Server server, Socket clientSocket, Board board) {
         this.server = server;
@@ -40,25 +36,12 @@ public class ClientHandler extends Thread {
         try {
             InputStream inputStream = clientSocket.getInputStream();
             this.sendStream = clientSocket.getOutputStream();
-            assignCmds();
+            CommandHandler commandHandler = new CommandHandler(sendStream, server, board, login, symbol, msgPipe);
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] tokens = line.split(" ");
-                if (tokens.length > 0) {
-                    String cmd = tokens[0];
-                    if (serverCommands.containsKey(cmd)) {
-                        Command c = serverCommands.get(cmd);
-                        try {
-                            c.execute(tokens);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        String invCmd = "Invalid command: " + tokens[0] + "\n";
-                        msgPipe.offer(invCmd);
-                    }
-                }
+                commandHandler.handle(tokens);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -67,13 +50,6 @@ public class ClientHandler extends Thread {
 
     public String getLogin() {
         return login.toString();
-    }
-
-    public Symbol getSymbol() {
-        if (symbol.toString().equalsIgnoreCase("x"))
-            return Symbol.X;
-        else
-            return Symbol.O;
     }
 
     public void send(String msg) {
@@ -91,12 +67,5 @@ public class ClientHandler extends Thread {
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private void assignCmds() {
-        serverCommands.put("login", new LoginCommand(sendStream, login, server, board, this.symbol));
-        serverCommands.put("addnaught", new AddNaughtCommand(sendStream, login, server, board));
-        serverCommands.put("addcross", new AddCrossCommand(sendStream, login, server, board));
-        serverCommands.put("isalive", new Heartbeat(sendStream, login, server));
     }
 }
