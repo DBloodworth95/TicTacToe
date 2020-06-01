@@ -18,7 +18,7 @@ public class Display extends JFrame implements ActionListener {
     static final int BOARD_LENGTH = 3;
     static final int BOARD_WIDTH = 3;
     static final int PORT = 8818;
-    final Client client = new Client("localhost", PORT, "guest", null);
+    final Client client = new Client("localhost", PORT);
     private boolean disconnected = false;
     JButton[][] tiles = new JButton[BOARD_LENGTH][BOARD_WIDTH];
     JPanel statusPanel = new JPanel();

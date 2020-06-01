@@ -10,6 +10,7 @@ import java.io.*;
 import java.net.Socket;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static javax.swing.SwingUtilities.invokeLater;
 
@@ -22,12 +23,11 @@ public class Client {
     private InputStream inputStream;
     private BufferedReader bufferedReader;
     private String username;
-    private Symbol symbol;
+    private AtomicReference<Symbol> symbol = new AtomicReference<>();
     private List<LobbyStatusListener> lobbyStatusListeners = new ArrayList<>();
     private List<MessageListener> messageListeners = new ArrayList<>();
     private final BlockingQueue<String> msgPipe = new ArrayBlockingQueue<>(10);
     private final BlockingQueue<String> heartbeatPipe = new ArrayBlockingQueue<>(1);
-    private Map<String, Command> clientCommands = new HashMap<>();
     private Thread messageLoopThread;
     private Thread heartBeatSenderThread;
     private Thread serverWriterThread;
@@ -36,12 +36,9 @@ public class Client {
     private ServerWriter serverWriter;
     private HeartbeatSender heartbeatSender;
 
-
-    public Client(String serverName, int port, String username, Symbol symbol) {
+    public Client(String serverName, int port) {
         this.serverName = serverName;
         this.port = port;
-        this.username = username;
-        this.symbol = symbol;
     }
 
     public boolean connect() {
@@ -68,20 +65,14 @@ public class Client {
     }
 
     private void readMessageLoop() {
-        assignCmds();
+        CommandHandler commandHandler = new CommandHandler(messageListeners, heartbeatPipe);
         try {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 String[] tokens = line.split(" ");
                 String cmd = tokens[0];
                 invokeLater(() -> {
-                    if ("cross".equalsIgnoreCase(cmd) || "naught".equalsIgnoreCase(cmd)) {
-                        this.symbol = SymbolAssigner.assign(cmd);
-                    }
-                    if (clientCommands.containsKey(cmd)) {
-                        Command c = clientCommands.get(cmd);
-                        c.execute(tokens);
-                    }
+                    commandHandler.handle(cmd, tokens, symbol);
                 });
             }
         } catch (Exception e) {
@@ -91,20 +82,11 @@ public class Client {
 
     public void requestSymbol(int x, int y) {
         String symbolCmd;
-        if (symbol.toString().equalsIgnoreCase("x"))
+        if (this.symbol.toString().equalsIgnoreCase("x"))
             symbolCmd = "addcross";
         else
             symbolCmd = "addnaught";
         msgPipe.offer(symbolCmd + " " + x + " " + y + "\n");
-    }
-
-    private void assignCmds() {
-        clientCommands.put("addcross", new AddSymbol(messageListeners));
-        clientCommands.put("addnaught", new AddSymbol(messageListeners));
-        clientCommands.put("win", new Win(messageListeners));
-        clientCommands.put("isalive", new Heartbeat(heartbeatPipe));
-        clientCommands.put("waiting", new LobbyStatus(messageListeners));
-        clientCommands.put("ready", new LobbyStatus(messageListeners));
     }
 
     private void startWorkerThreads() {
@@ -140,7 +122,7 @@ public class Client {
         messageListeners.add(messageListener);
     }
 
-    public Symbol getSymbol() {
+    public AtomicReference<Symbol> getSymbol() {
         return symbol;
     }
 }
